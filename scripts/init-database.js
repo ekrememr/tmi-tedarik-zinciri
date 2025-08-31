@@ -367,6 +367,10 @@ function insertInitialData() {
         
         console.log('\n🚀 Sunucuyu başlatmak için: npm start');
         
-        db.close();
-    }, 2000);
+        db.close((err) => {
+            if (err) console.error('❌ Database close error:', err.message);
+            console.log('✅ Database connection closed');
+            process.exit(0);
+        });
+    }, 3000);
 }

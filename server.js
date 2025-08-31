@@ -24,6 +24,11 @@ const PORT = process.env.PORT || 8000;
 
 console.log('🚀 TEDARİK ZİNCİRİ TMI SİSTEMİ BAŞLATILIYOR...\n');
 
+// Trust proxy for Render deployment
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
+
 // Rate limiting
 const limiter = createRateLimit(15 * 60 * 1000, 100); // 15 dakikada 100 istek
 app.use('/api/', limiter);
