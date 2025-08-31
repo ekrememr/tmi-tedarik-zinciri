@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talepler - TMI Tedarik Zinciri</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #8b5cf6;
+            --success-color: #06d6a0;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1e293b;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar - Same as dashboard */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(135deg, var(--dark-color) 0%, #334155 100%);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .sidebar-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-subtitle {
+            color: #94a3b8;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            color: #64748b;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 25px 10px;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            margin-bottom: 2px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-create {
+            background: linear-gradient(135deg, var(--success-color), #10b981);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-create:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(6, 214, 160, 0.4);
+        }
+
+        .btn-excel {
+            background: linear-gradient(135deg, var(--warning-color), #f97316);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-excel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+        }
+
+        /* Requests Table */
+        .requests-table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-sm:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Custom DataTable Styling */
+        .table-responsive {
+            padding: 0 30px 30px;
+        }
+
+        #requestsTable {
+            width: 100%;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: rgba(6, 214, 160, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-closed {
+            background: rgba(100, 116, 139, 0.1);
+            color: #64748b;
+        }
+
+        .status-cancelled {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .priority-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-low {
+            background: rgba(100, 116, 139, 0.1);
+            color: #64748b;
+        }
+
+        .priority-normal {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+        }
+
+        .priority-high {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .priority-urgent {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        /* Modal Styles */
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-modal {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* Excel Upload Area */
+        .excel-upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .excel-upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .excel-upload-area.dragover {
+            border-color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            color: #64748b;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Loading States */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px;
+            color: #64748b;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f1f5f9;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .topbar {
+                padding: 15px 20px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .topbar-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-industry"></i>
+            </div>
+            <div class="sidebar-title">TMI Admin</div>
+            <div class="sidebar-subtitle">Tedarik Zinciri</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Ana Menü</div>
+                <div class="nav-item">
+                    <a href="/admin" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/requests" class="nav-link active">
+                        <i class="fas fa-clipboard-list"></i>
+                        Talepler
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/suppliers" class="nav-link">
+                        <i class="fas fa-building"></i>
+                        Tedarikçiler
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/quotations" class="nav-link">
+                        <i class="fas fa-file-invoice"></i>
+                        Teklifler
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Analitik</div>
+                <div class="nav-item">
+                    <a href="/admin/reports" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        Raporlar
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Sistem</div>
+                <div class="nav-item">
+                    <a href="/admin/settings" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        Ayarlar
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Çıkış
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <h1 class="topbar-title">
+                <i class="fas fa-clipboard-list me-3"></i>
+                Talep Yönetimi
+            </h1>
+            <div class="topbar-actions">
+                <button class="btn-excel" onclick="showExcelModal()">
+                    <i class="fas fa-file-excel"></i>
+                    Excel Yükle
+                </button>
+                <button class="btn-create" onclick="showCreateModal()">
+                    <i class="fas fa-plus"></i>
+                    Yeni Talep
+                </button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <h3 class="filter-title">
+                    <i class="fas fa-filter me-2"></i>
+                    Filtreler
+                </h3>
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">Durum</label>
+                        <select class="form-select" id="statusFilter">
+                            <option value="">Tüm Durumlar</option>
+                            <option value="active">Aktif</option>
+                            <option value="closed">Kapalı</option>
+                            <option value="cancelled">İptal Edildi</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Öncelik</label>
+                        <select class="form-select" id="priorityFilter">
+                            <option value="">Tüm Öncelikler</option>
+                            <option value="low">Düşük</option>
+                            <option value="normal">Normal</option>
+                            <option value="high">Yüksek</option>
+                            <option value="urgent">Acil</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tarih Aralığı</label>
+                        <input type="date" class="form-control" id="dateFilter">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <button class="btn btn-primary w-100" onclick="applyFilters()">
+                                <i class="fas fa-search me-2"></i>
+                                Filtrele
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requests Table -->
+            <div class="requests-table-container">
+                <div class="table-header">
+                    <h3 class="table-title">Talepler Listesi</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn-primary" onclick="refreshTable()">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            Yenile
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="exportExcel()">
+                            <i class="fas fa-download me-1"></i>
+                            Excel
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="requestsTable" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Talep No</th>
+                                <th>Başlık</th>
+                                <th>Durum</th>
+                                <th>Öncelik</th>
+                                <th>Tedarikçi</th>
+                                <th>Teklif</th>
+                                <th>Son Tarih</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Loading -->
+                <div class="loading" id="tableLoading">
+                    <div class="spinner"></div>
+                    <p>Talepler yükleniyor...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Request Modal -->
+    <div class="modal fade" id="createRequestModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus me-2"></i>
+                        Yeni Talep Oluştur
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createRequestForm">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <label class="form-label">Talep Başlığı <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="requestTitle" placeholder="Örn: Metal malzeme talebi" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Öncelik</label>
+                                <select class="form-select" id="requestPriority">
+                                    <option value="normal">Normal</option>
+                                    <option value="high">Yüksek</option>
+                                    <option value="urgent">Acil</option>
+                                    <option value="low">Düşük</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Açıklama</label>
+                            <textarea class="form-control" id="requestDescription" rows="3" 
+                                      placeholder="Talep hakkında detaylı bilgi..."></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Son Tarih</label>
+                                <input type="datetime-local" class="form-control" id="requestDeadline">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tedarikçiler <span class="text-danger">*</span></label>
+                                <select class="form-select" id="requestSuppliers" multiple>
+                                    <!-- Will be loaded dynamically -->
+                                </select>
+                                <small class="text-muted">Ctrl tuşu ile çoklu seçim yapabilirsiniz</small>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-3">
+                            <h6>Malzeme Listesi</h6>
+                            <div id="materialsContainer">
+                                <div class="material-item">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" placeholder="Malzeme adı" name="material_name">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="number" class="form-control" placeholder="Miktar" name="quantity">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="text" class="form-control" placeholder="Birim" name="unit">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" placeholder="Özellikler" name="specifications">
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="removeMaterial(this)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addMaterial()">
+                                <i class="fas fa-plus me-1"></i>
+                                Malzeme Ekle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" form="createRequestForm" class="btn btn-success">
+                        <i class="fas fa-save me-1"></i>
+                        Talep Oluştur
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Excel Upload Modal -->
+    <div class="modal fade" id="excelUploadModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-file-excel me-2"></i>
+                        Excel'den Malzeme Yükle
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="excel-upload-area" id="excelDropArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">
+                            Excel dosyasını buraya sürükleyin veya tıklayın
+                        </div>
+                        <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display: none;">
+                        <button class="btn btn-primary" onclick="document.getElementById('excelFileInput').click()">
+                            <i class="fas fa-folder-open me-2"></i>
+                            Dosya Seç
+                        </button>
+                    </div>
+
+                    <div class="mt-3">
+                        <a href="/api/upload/excel-template" class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-download me-1"></i>
+                            Excel Şablonunu İndir
+                        </a>
+                    </div>
+
+                    <!-- Excel Preview -->
+                    <div id="excelPreview" style="display: none;" class="mt-4">
+                        <h6>Excel Önizleme:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered" id="excelPreviewTable">
+                                <!-- Preview data will be loaded here -->
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-between mt-3">
+                            <button class="btn btn-secondary" onclick="clearExcelData()">
+                                <i class="fas fa-times me-1"></i>
+                                Temizle
+                            </button>
+                            <button class="btn btn-success" onclick="createRequestFromExcel()">
+                                <i class="fas fa-plus me-1"></i>
+                                Bu Verilerden Talep Oluştur
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        let requestsTable;
+        let excelData = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            initializeDataTable();
+            loadRequests();
+            loadSuppliers();
+            setupExcelUpload();
+        });
+
+        // Check authentication
+        function checkAuth() {
+            const user = localStorage.getItem('tedarik_user');
+            if (!user) {
+                window.location.href = '/login';
+                return;
+            }
+
+            const userData = JSON.parse(user);
+            if (userData.role !== 'admin') {
+                alert('Admin yetkisi gerekli!');
+                window.location.href = '/login';
+                return;
+            }
+        }
+
+        // Initialize DataTable
+        function initializeDataTable() {
+            requestsTable = $('#requestsTable').DataTable({
+                responsive: true,
+                pageLength: 25,
+                order: [[0, 'desc']],
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/tr.json'
+                },
+                columnDefs: [
+                    { targets: -1, orderable: false } // Disable sorting for actions column
+                ]
+            });
+        }
+
+        // Load requests
+        async function loadRequests() {
+            showTableLoading(true);
+
+            try {
+                const response = await fetch('/api/admin/requests', {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Talepler yüklenemedi');
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    populateRequestsTable(data.data || []);
+                } else {
+                    // Show demo data if API fails
+                    populateRequestsTable(getDemoData());
+                }
+            } catch (error) {
+                console.error('Load requests error:', error);
+                populateRequestsTable(getDemoData());
+            } finally {
+                showTableLoading(false);
+            }
+        }
+
+        // Populate table with data
+        function populateRequestsTable(requests) {
+            requestsTable.clear();
+
+            requests.forEach(request => {
+                const statusBadge = `<span class="status-badge status-${request.status}">${getStatusText(request.status)}</span>`;
+                const priorityBadge = `<span class="priority-badge priority-${request.priority}">${getPriorityText(request.priority)}</span>`;
+                const deadline = request.deadline ? new Date(request.deadline).toLocaleDateString('tr-TR') : '-';
+                
+                const actions = `
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-primary" onclick="viewRequest(${request.id})" title="Görüntüle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="compareQuotations(${request.id})" title="Teklifleri Karşılaştır">
+                            <i class="fas fa-balance-scale"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="editRequest(${request.id})" title="Düzenle">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteRequest(${request.id})" title="Sil">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+
+                requestsTable.row.add([
+                    request.request_no || `REQ${request.id}`,
+                    request.title,
+                    statusBadge,
+                    priorityBadge,
+                    request.invited_suppliers || 0,
+                    request.received_quotations || 0,
+                    deadline,
+                    actions
+                ]);
+            });
+
+            requestsTable.draw();
+        }
+
+        // Demo data for testing
+        function getDemoData() {
+            return [
+                {
+                    id: 1,
+                    request_no: 'REQ202501001',
+                    title: 'Metal Malzeme Talebi',
+                    status: 'active',
+                    priority: 'high',
+                    invited_suppliers: 3,
+                    received_quotations: 2,
+                    deadline: '2025-09-15'
+                },
+                {
+                    id: 2,
+                    request_no: 'REQ202501002',
+                    title: 'Makine Parçaları',
+                    status: 'active',
+                    priority: 'normal',
+                    invited_suppliers: 5,
+                    received_quotations: 4,
+                    deadline: '2025-09-20'
+                },
+                {
+                    id: 3,
+                    request_no: 'REQ202501003',
+                    title: 'Kimyasal Maddeler',
+                    status: 'closed',
+                    priority: 'urgent',
+                    invited_suppliers: 2,
+                    received_quotations: 2,
+                    deadline: '2025-08-30'
+                }
+            ];
+        }
+
+        // Load suppliers for dropdown
+        async function loadSuppliers() {
+            try {
+                const response = await fetch('/api/admin/suppliers?status=approved', {
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                const suppliers = data.success ? data.data : getDemoSuppliers();
+
+                const selectElement = document.getElementById('requestSuppliers');
+                selectElement.innerHTML = suppliers.map(supplier => 
+                    `<option value="${supplier.id}">${supplier.company_name}</option>`
+                ).join('');
+            } catch (error) {
+                console.error('Load suppliers error:', error);
+                // Use demo suppliers
+                const selectElement = document.getElementById('requestSuppliers');
+                selectElement.innerHTML = getDemoSuppliers().map(supplier => 
+                    `<option value="${supplier.id}">${supplier.company_name}</option>`
+                ).join('');
+            }
+        }
+
+        function getDemoSuppliers() {
+            return [
+                { id: 1, company_name: 'Demirtaş Metal San. Tic. Ltd. Şti.' },
+                { id: 2, company_name: 'Yılmaz Mühendislik A.Ş.' },
+                { id: 3, company_name: 'Atlas Kimya San. Tic. A.Ş.' }
+            ];
+        }
+
+        // Excel upload setup
+        function setupExcelUpload() {
+            const fileInput = document.getElementById('excelFileInput');
+            const dropArea = document.getElementById('excelDropArea');
+
+            fileInput.addEventListener('change', handleExcelFile);
+
+            // Drag and drop
+            dropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropArea.classList.add('dragover');
+            });
+
+            dropArea.addEventListener('dragleave', () => {
+                dropArea.classList.remove('dragover');
+            });
+
+            dropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleExcelFile({ target: { files } });
+                }
+            });
+        }
+
+        // Handle Excel file upload
+        async function handleExcelFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('excelFile', file);
+
+            try {
+                const response = await fetch('/api/upload/excel', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    excelData = result.data;
+                    showExcelPreview(result.data);
+                    alert('Excel başarıyla yüklendi: ' + result.message);
+                } else {
+                    alert('Excel yüklenemedi: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Excel upload error:', error);
+                alert('Excel yükleme hatası: ' + error.message);
+            }
+        }
+
+        // Show Excel preview
+        function showExcelPreview(data) {
+            const previewDiv = document.getElementById('excelPreview');
+            const table = document.getElementById('excelPreviewTable');
+
+            table.innerHTML = `
+                <thead class="table-dark">
+                    <tr>
+                        <th>Malzeme Kodu</th>
+                        <th>Malzeme Adı</th>
+                        <th>Miktar</th>
+                        <th>Birim</th>
+                        <th>Kategori</th>
+                        <th>Öncelik</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(item => `
+                        <tr>
+                            <td>${item.material_code}</td>
+                            <td>${item.material_name}</td>
+                            <td class="text-end">${item.quantity}</td>
+                            <td>${item.unit}</td>
+                            <td>${item.category}</td>
+                            <td><span class="priority-badge priority-${item.priority}">${getPriorityText(item.priority)}</span></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            `;
+
+            previewDiv.style.display = 'block';
+        }
+
+        // Modal functions
+        function showCreateModal() {
+            const modal = new bootstrap.Modal(document.getElementById('createRequestModal'));
+            modal.show();
+        }
+
+        function showExcelModal() {
+            const modal = new bootstrap.Modal(document.getElementById('excelUploadModal'));
+            modal.show();
+        }
+
+        // Material management
+        function addMaterial() {
+            const container = document.getElementById('materialsContainer');
+            const materialItem = document.createElement('div');
+            materialItem.className = 'material-item mt-3';
+            materialItem.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="Malzeme adı" name="material_name">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" placeholder="Miktar" name="quantity">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" placeholder="Birim" name="unit">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Özellikler" name="specifications">
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeMaterial(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(materialItem);
+        }
+
+        function removeMaterial(button) {
+            button.closest('.material-item').remove();
+        }
+
+        // Create request from Excel data
+        function createRequestFromExcel() {
+            if (excelData.length === 0) {
+                alert('Excel verisi bulunamadı!');
+                return;
+            }
+
+            // Fill form with Excel data
+            document.getElementById('requestTitle').value = `Excel Import - ${new Date().toLocaleDateString('tr-TR')}`;
+            
+            // Clear existing materials and add Excel data
+            document.getElementById('materialsContainer').innerHTML = '';
+            
+            excelData.forEach(item => {
+                const container = document.getElementById('materialsContainer');
+                const materialItem = document.createElement('div');
+                materialItem.className = 'material-item mb-3';
+                materialItem.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" placeholder="Malzeme adı" name="material_name" value="${item.material_name}">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="number" class="form-control" placeholder="Miktar" name="quantity" value="${item.quantity}">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" class="form-control" placeholder="Birim" name="unit" value="${item.unit}">
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="Özellikler" name="specifications" value="${item.specifications || ''}">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeMaterial(this)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(materialItem);
+            });
+
+            // Close Excel modal and show create modal
+            bootstrap.Modal.getInstance(document.getElementById('excelUploadModal')).hide();
+            showCreateModal();
+        }
+
+        // Form submission
+        document.getElementById('createRequestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                title: document.getElementById('requestTitle').value,
+                description: document.getElementById('requestDescription').value,
+                priority: document.getElementById('requestPriority').value,
+                deadline: document.getElementById('requestDeadline').value,
+                supplier_ids: Array.from(document.getElementById('requestSuppliers').selectedOptions).map(option => option.value),
+                items: []
+            };
+
+            // Collect materials
+            const materialItems = document.querySelectorAll('.material-item');
+            materialItems.forEach(item => {
+                const inputs = item.querySelectorAll('input');
+                if (inputs[0].value && inputs[1].value && inputs[2].value) {
+                    formData.items.push({
+                        material_name: inputs[0].value,
+                        quantity: parseFloat(inputs[1].value),
+                        unit: inputs[2].value,
+                        specifications: inputs[3].value
+                    });
+                }
+            });
+
+            if (formData.items.length === 0) {
+                alert('En az bir malzeme eklemelisiniz!');
+                return;
+            }
+
+            if (formData.supplier_ids.length === 0) {
+                alert('En az bir tedarikçi seçmelisiniz!');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/requests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Talep başarıyla oluşturuldu!');
+                    bootstrap.Modal.getInstance(document.getElementById('createRequestModal')).hide();
+                    refreshTable();
+                } else {
+                    alert('Talep oluşturulamadı: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Create request error:', error);
+                alert('Talep oluşturulurken hata oluştu!');
+            }
+        });
+
+        // Table actions
+        function viewRequest(id) {
+            window.location.href = `/admin/requests/${id}`;
+        }
+
+        function compareQuotations(id) {
+            window.location.href = `/admin/quotations/compare/${id}`;
+        }
+
+        function editRequest(id) {
+            alert('Düzenleme özelliği yakında eklenecek!');
+        }
+
+        function deleteRequest(id) {
+            if (confirm('Bu talebi silmek istediğinizden emin misiniz?')) {
+                // Delete request logic here
+                alert('Silme özelliği yakında eklenecek!');
+            }
+        }
+
+        // Utility functions
+        function getStatusText(status) {
+            const statusMap = {
+                'active': 'Aktif',
+                'closed': 'Kapalı',
+                'cancelled': 'İptal',
+                'draft': 'Taslak'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getPriorityText(priority) {
+            const priorityMap = {
+                'low': 'Düşük',
+                'normal': 'Normal',
+                'high': 'Yüksek',
+                'urgent': 'Acil'
+            };
+            return priorityMap[priority] || priority;
+        }
+
+        function showTableLoading(show) {
+            const loading = document.getElementById('tableLoading');
+            const table = document.querySelector('.table-responsive');
+
+            if (show) {
+                loading.style.display = 'block';
+                table.style.display = 'none';
+            } else {
+                loading.style.display = 'none';
+                table.style.display = 'block';
+            }
+        }
+
+        function refreshTable() {
+            loadRequests();
+        }
+
+        function applyFilters() {
+            // Filter logic will be implemented here
+            alert('Filtre özelliği yakında eklenecek!');
+        }
+
+        function exportExcel() {
+            window.open('/api/reports/excel/requests', '_blank');
+        }
+
+        function clearExcelData() {
+            excelData = [];
+            document.getElementById('excelPreview').style.display = 'none';
+            document.getElementById('excelFileInput').value = '';
+        }
+
+        function logout() {
+            if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
+                localStorage.removeItem('tedarik_user');
+                localStorage.removeItem('tedarik_token');
+                
+                fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                }).finally(() => {
+                    window.location.href = '/login';
+                });
+            }
+        }
+    </script>
+</body>
+</html>

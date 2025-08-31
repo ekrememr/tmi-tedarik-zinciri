@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tedarikçi Portal - TMI Tedarik Zinciri</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #8b5cf6;
+            --success-color: #06d6a0;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1e293b;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(135deg, var(--dark-color) 0%, #334155 100%);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .sidebar-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-subtitle {
+            color: #94a3b8;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin-bottom: 2px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        .company-info {
+            color: #64748b;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .approval-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .approval-status.approved {
+            background: rgba(6, 214, 160, 0.1);
+            color: var(--success-color);
+        }
+
+        .approval-status.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card.primary { border-left-color: var(--primary-color); }
+        .stat-card.success { border-left-color: var(--success-color); }
+        .stat-card.warning { border-left-color: var(--warning-color); }
+        .stat-card.danger { border-left-color: var(--danger-color); }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-icon.primary { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); }
+        .stat-icon.success { background: linear-gradient(135deg, var(--success-color), #10b981); }
+        .stat-icon.warning { background: linear-gradient(135deg, var(--warning-color), #f97316); }
+        .stat-icon.danger { background: linear-gradient(135deg, var(--danger-color), #dc2626); }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Pending Requests */
+        .pending-requests {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .card-header {
+            padding: 25px 30px 0;
+            border-bottom: none;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 20px 30px 30px;
+        }
+
+        .request-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #f1f5f9;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .request-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1);
+        }
+
+        .request-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .request-info {
+            flex: 1;
+        }
+
+        .request-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .request-meta {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .request-deadline {
+            text-align: right;
+            min-width: 120px;
+        }
+
+        .deadline-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .deadline-badge.urgent {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .deadline-badge.normal {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .deadline-badge.safe {
+            background: rgba(6, 214, 160, 0.1);
+            color: var(--success-color);
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 15px;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Performance Chart */
+        .performance-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px;
+            color: #64748b;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f1f5f9;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="sidebar-title" id="companyName">Tedarikçi Portal</div>
+            <div class="sidebar-subtitle">TMI Tedarik Zinciri</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-item">
+                <a href="/supplier" class="nav-link active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/supplier/requests" class="nav-link">
+                    <i class="fas fa-clipboard-list"></i>
+                    Aktif Talepler
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/supplier/quotations" class="nav-link">
+                    <i class="fas fa-file-invoice"></i>
+                    Teklif Geçmişi
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/supplier/profile" class="nav-link">
+                    <i class="fas fa-user-cog"></i>
+                    Profil Ayarları
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Çıkış
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1 class="topbar-title">Tedarikçi Dashboard</h1>
+                <div class="company-info">
+                    <span id="welcomeText">Hoş geldiniz</span>
+                    <span class="approval-status" id="approvalStatus">
+                        <i class="fas fa-clock"></i>
+                        Onay Bekleniyor
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Dashboard yükleniyor...</p>
+            </div>
+
+            <!-- Content will be loaded here -->
+            <div id="dashboardContent" style="display: none;">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card primary">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-number" id="activeRequestsCount">-</div>
+                                <div class="stat-label">Aktif Talep</div>
+                            </div>
+                            <div class="stat-icon primary">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card success">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-number" id="submittedQuotationsCount">-</div>
+                                <div class="stat-label">Gönderilen Teklif</div>
+                            </div>
+                            <div class="stat-icon success">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card warning">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-number" id="wonQuotationsCount">-</div>
+                                <div class="stat-label">Kazanılan Teklif</div>
+                            </div>
+                            <div class="stat-icon warning">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card danger">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-number" id="totalValueAmount">-</div>
+                                <div class="stat-label">Toplam Değer (₺)</div>
+                            </div>
+                            <div class="stat-icon danger">
+                                <i class="fas fa-lira-sign"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Requests -->
+                <div class="pending-requests">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-clock me-2"></i>
+                            Yaklaşan Deadline'lar
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="upcomingDeadlines">
+                            <!-- Deadlines will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Chart -->
+                <div class="performance-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Performans Özeti
+                        </h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="responseChart" height="200"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <canvas id="winRateChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Not Approved Message -->
+            <div id="notApprovedMessage" style="display: none;">
+                <div class="text-center py-5">
+                    <div style="font-size: 60px; color: #f59e0b; margin-bottom: 30px;">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <h3 style="color: #1e293b; margin-bottom: 20px;">Hesap Onayı Bekleniyor</h3>
+                    <p style="color: #64748b; max-width: 500px; margin: 0 auto; line-height: 1.6;">
+                        Tedarikçi başvurunuz değerlendirme sürecindedir. Onaylandıktan sonra 
+                        teklif talepleri almaya başlayacaksınız.
+                    </p>
+                    <div class="mt-4">
+                        <button class="btn btn-outline-primary" onclick="checkApprovalStatus()">
+                            <i class="fas fa-sync-alt me-2"></i>
+                            Durumu Kontrol Et
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let userToken = localStorage.getItem('tedarik_token');
+        let userData = null;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadDashboard();
+        });
+
+        // Check authentication
+        function checkAuth() {
+            const user = localStorage.getItem('tedarik_user');
+            if (!user) {
+                window.location.href = '/login';
+                return;
+            }
+
+            userData = JSON.parse(user);
+            if (userData.role !== 'supplier') {
+                alert('Tedarikçi yetkisi gerekli!');
+                window.location.href = '/login';
+                return;
+            }
+
+            // Update UI with user info
+            if (userData.company_name) {
+                document.getElementById('companyName').textContent = userData.company_name;
+                document.getElementById('welcomeText').textContent = `${userData.company_name} - Hoş geldiniz`;
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            showLoading(true);
+
+            try {
+                const response = await fetch('/api/supplier/dashboard', {
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Dashboard yüklenemedi');
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Check approval status
+                    if (userData.is_approved === false) {
+                        showNotApprovedMessage();
+                        return;
+                    }
+
+                    updateApprovalStatus(true);
+                    updateStats(data.dashboard.stats);
+                    updateUpcomingDeadlines(data.dashboard.upcoming_deadlines);
+                    updatePerformanceCharts(data.dashboard.performance);
+                    showDashboardContent();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Dashboard error:', error);
+                
+                // Show demo data if API fails
+                showDemoData();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Show demo data for testing
+        function showDemoData() {
+            updateApprovalStatus(true);
+            updateStats({
+                active_requests: { count: 5 },
+                submitted_quotations: { count: 12 },
+                won_quotations: { count: 3 },
+                total_value: { total: 145000 }
+            });
+            
+            // Demo upcoming deadlines
+            const demoDeadlines = [
+                {
+                    id: 1,
+                    title: 'Metal Malzeme Talebi',
+                    deadline: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+                    priority: 'high'
+                },
+                {
+                    id: 2,
+                    title: 'Makine Parçaları',
+                    deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                    priority: 'normal'
+                }
+            ];
+            updateUpcomingDeadlines(demoDeadlines);
+            
+            // Demo performance
+            updatePerformanceCharts({
+                response_rate: { rate: 85 },
+                win_rate: { rate: 25 }
+            });
+            
+            showDashboardContent();
+        }
+
+        // Update statistics
+        function updateStats(stats) {
+            document.getElementById('activeRequestsCount').textContent = stats.active_requests?.count || 0;
+            document.getElementById('submittedQuotationsCount').textContent = stats.submitted_quotations?.count || 0;
+            document.getElementById('wonQuotationsCount').textContent = stats.won_quotations?.count || 0;
+            
+            const totalValue = stats.total_value?.total || 0;
+            document.getElementById('totalValueAmount').textContent = totalValue.toLocaleString('tr-TR');
+        }
+
+        // Update approval status
+        function updateApprovalStatus(isApproved) {
+            const statusElement = document.getElementById('approvalStatus');
+            if (isApproved) {
+                statusElement.innerHTML = '<i class="fas fa-check-circle"></i> Onaylandı';
+                statusElement.className = 'approval-status approved';
+            } else {
+                statusElement.innerHTML = '<i class="fas fa-clock"></i> Onay Bekleniyor';
+                statusElement.className = 'approval-status pending';
+            }
+        }
+
+        // Update upcoming deadlines
+        function updateUpcomingDeadlines(deadlines) {
+            const container = document.getElementById('upcomingDeadlines');
+            
+            if (!deadlines || deadlines.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-4">Yaklaşan deadline yok</div>';
+                return;
+            }
+
+            container.innerHTML = deadlines.slice(0, 5).map(deadline => {
+                const daysLeft = Math.ceil((new Date(deadline.deadline) - new Date()) / (1000 * 60 * 60 * 24));
+                let badgeClass = 'safe';
+                let badgeText = `${daysLeft} gün kaldı`;
+                
+                if (daysLeft <= 1) {
+                    badgeClass = 'urgent';
+                    badgeText = daysLeft === 0 ? 'Son gün!' : '1 gün kaldı';
+                } else if (daysLeft <= 3) {
+                    badgeClass = 'normal';
+                }
+
+                return `
+                    <div class="request-item">
+                        <div class="request-info">
+                            <div class="request-title">${deadline.title}</div>
+                            <div class="request-meta">
+                                Öncelik: ${deadline.priority === 'high' ? 'Yüksek' : deadline.priority === 'normal' ? 'Normal' : 'Düşük'}
+                            </div>
+                        </div>
+                        <div class="request-deadline">
+                            <div class="deadline-badge ${badgeClass}">
+                                <i class="fas fa-clock"></i>
+                                ${badgeText}
+                            </div>
+                            <button class="btn-action" onclick="viewRequest(${deadline.id})">
+                                Görüntüle
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update performance charts
+        function updatePerformanceCharts(performance) {
+            // Response Rate Chart
+            const responseCtx = document.getElementById('responseChart').getContext('2d');
+            new Chart(responseCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Yanıtlanan', 'Yanıtlanmayan'],
+                    datasets: [{
+                        data: [performance.response_rate?.rate || 0, 100 - (performance.response_rate?.rate || 0)],
+                        backgroundColor: ['#06d6a0', '#f1f5f9'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Yanıt Oranı'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Win Rate Chart
+            const winCtx = document.getElementById('winRateChart').getContext('2d');
+            new Chart(winCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Kazanılan', 'Kaybedilen'],
+                    datasets: [{
+                        data: [performance.win_rate?.rate || 0, 100 - (performance.win_rate?.rate || 0)],
+                        backgroundColor: ['#3b82f6', '#f1f5f9'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Kazanım Oranı'
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // UI State Management
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            const content = document.getElementById('dashboardContent');
+            const notApproved = document.getElementById('notApprovedMessage');
+
+            if (show) {
+                loading.style.display = 'block';
+                content.style.display = 'none';
+                notApproved.style.display = 'none';
+            } else {
+                loading.style.display = 'none';
+            }
+        }
+
+        function showDashboardContent() {
+            document.getElementById('dashboardContent').style.display = 'block';
+            document.getElementById('notApprovedMessage').style.display = 'none';
+        }
+
+        function showNotApprovedMessage() {
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('notApprovedMessage').style.display = 'block';
+        }
+
+        // Actions
+        function viewRequest(requestId) {
+            window.location.href = `/supplier/requests/${requestId}`;
+        }
+
+        function checkApprovalStatus() {
+            // Reload user data
+            location.reload();
+        }
+
+        function logout() {
+            if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
+                localStorage.removeItem('tedarik_user');
+                localStorage.removeItem('tedarik_token');
+                window.location.href = '/login';
+            }
+        }
+    </script>
+</body>
+</html>

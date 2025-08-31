@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aktif Talepler | TMI Tedarikçi Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0f0f23;
+            --secondary-color: #1a1a2e;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-light: #e4e6ea;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(15, 15, 35, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border-color);
+            min-height: calc(100vh - 76px);
+        }
+
+        .sidebar .nav-link {
+            color: var(--text-muted);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 4px 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .card {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            background: rgba(59, 130, 246, 0.1);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 15px 15px 0 0 !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            border: none;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+            border: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            border: none;
+        }
+
+        .table-dark {
+            background: rgba(26, 26, 46, 0.6);
+            border-color: var(--border-color);
+        }
+
+        .table-dark td, .table-dark th {
+            border-color: var(--border-color);
+            vertical-align: middle;
+        }
+
+        .badge {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge.bg-success {
+            background: linear-gradient(135deg, var(--success-color), #059669) !important;
+        }
+
+        .badge.bg-warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706) !important;
+        }
+
+        .badge.bg-primary {
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6) !important;
+        }
+
+        .modal-content {
+            background: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+        }
+
+        .form-control, .form-select, .form-control[readonly] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 10px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--accent-color);
+            color: var(--text-light);
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-control[readonly] {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+        }
+
+        .stats-label {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .urgent-deadline {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .deadline-warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.2));
+            border-left: 4px solid var(--warning-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .deadline-critical {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
+            border-left: 4px solid var(--danger-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .dataTables_wrapper {
+            color: var(--text-light);
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 10px;
+            padding: 8px 12px;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 8px;
+        }
+
+        .page-link {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+        }
+
+        .page-link:hover {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .page-item.active .page-link {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .material-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .quotation-form {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/supplier">
+                <i class="fas fa-building me-2"></i>TMI Tedarikçi Portal
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-2"></i><span id="supplierName">Tedarikçi</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="/supplier/profile"><i class="fas fa-user me-2"></i>Profil</a></li>
+                        <li><a class="dropdown-item" href="/supplier/settings"><i class="fas fa-cog me-2"></i>Ayarlar</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Çıkış</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar">
+                    <nav class="nav flex-column py-3">
+                        <a class="nav-link" href="/supplier">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link active" href="/supplier/requests">
+                            <i class="fas fa-clipboard-list me-2"></i>Aktif Talepler
+                        </a>
+                        <a class="nav-link" href="/supplier/quotations">
+                            <i class="fas fa-file-invoice me-2"></i>Tekliflerim
+                        </a>
+                        <a class="nav-link" href="/supplier/profile">
+                            <i class="fas fa-user me-2"></i>Profil
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="main-content">
+                    <!-- Page Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="mb-1">
+                                <i class="fas fa-clipboard-list me-3"></i>Aktif Talepler
+                            </h2>
+                            <p class="text-muted mb-0">Size uygun talepleri görüntüleyin ve teklif verin</p>
+                        </div>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
+                                <div class="stats-number" id="activeRequests">0</div>
+                                <div class="stats-label">Aktif Talep</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-paper-plane"></i>
+                                </div>
+                                <div class="stats-number" id="submittedQuotations">0</div>
+                                <div class="stats-label">Verilen Teklif</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stats-number" id="urgentRequests">0</div>
+                                <div class="stats-label">Acil Talep</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Requests Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>Talep Listesi
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="loading-spinner" id="loadingSpinner">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                                <p class="mt-2">Talepler yükleniyor...</p>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table id="requestsTable" class="table table-dark table-hover" style="display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Başlık</th>
+                                            <th>Kategori</th>
+                                            <th>Yayınlanma</th>
+                                            <th>Son Tarih</th>
+                                            <th>Durum</th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data will be loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Request Modal -->
+    <div class="modal fade" id="viewRequestModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-eye me-2"></i>Talep Detayları
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6 class="text-primary mb-3">Genel Bilgiler</h6>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Talep Başlığı</label>
+                                    <input type="text" class="form-control" id="requestTitle" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Kategori</label>
+                                    <input type="text" class="form-control" id="requestCategory" readonly>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Açıklama</label>
+                                <textarea class="form-control" id="requestDescription" rows="4" readonly></textarea>
+                            </div>
+
+                            <h6 class="text-primary mb-3">Talep Edilen Materyaller</h6>
+                            <div id="requestMaterials">
+                                <!-- Materials will be loaded here -->
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6 class="text-primary mb-3">Zaman Çizelgesi</h6>
+                            <div class="mb-3" id="deadlineInfo">
+                                <!-- Deadline info will be loaded here -->
+                            </div>
+                            
+                            <h6 class="text-primary mb-3">Şartlar</h6>
+                            <div class="mb-3">
+                                <label class="form-label">Teslimat Yeri</label>
+                                <input type="text" class="form-control" id="deliveryLocation" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Ödeme Koşulları</label>
+                                <textarea class="form-control" id="paymentTerms" rows="3" readonly></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Özel Şartlar</label>
+                                <textarea class="form-control" id="specialRequirements" rows="3" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-primary" onclick="openQuotationModal()">
+                        <i class="fas fa-paper-plane me-2"></i>Teklif Ver
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quotation Modal -->
+    <div class="modal fade" id="quotationModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-paper-plane me-2"></i>Teklif Ver - <span id="quotationRequestTitle"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="quotationForm">
+                    <div class="modal-body quotation-form">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Geçerlilik Tarihi <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" name="validUntil" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Teslimat Süresi (Gün) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="deliveryTime" min="1" required>
+                            </div>
+                        </div>
+
+                        <h6 class="text-primary mb-3">Teklif Kalemleri</h6>
+                        <div id="quotationItems">
+                            <!-- Items will be loaded based on request materials -->
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">KDV Oranı (%)</label>
+                                <input type="number" class="form-control" name="taxRate" value="18" min="0" max="100" step="0.01">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">İndirim Tutarı (₺)</label>
+                                <input type="number" class="form-control" name="discountAmount" min="0" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Ödeme Koşulları</label>
+                                <select class="form-select" name="paymentTerms">
+                                    <option value="cash">Peşin</option>
+                                    <option value="30_days">30 Gün Vadeli</option>
+                                    <option value="60_days">60 Gün Vadeli</option>
+                                    <option value="90_days">90 Gün Vadeli</option>
+                                    <option value="custom">Özel</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Özel Ödeme Koşulu</label>
+                                <input type="text" class="form-control" name="customPaymentTerms" placeholder="Özel koşul belirtin...">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">Notlar ve Özel Şartlar</label>
+                            <textarea class="form-control" name="notes" rows="4" placeholder="Teklif ile ilgili özel notlar, şartlar veya açıklamalar..."></textarea>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="fas fa-calculator me-2"></i>Fiyat Özeti</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Ara Toplam</label>
+                                        <input type="text" class="form-control" id="subtotalDisplay" readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">KDV</label>
+                                        <input type="text" class="form-control" id="taxDisplay" readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">İndirim</label>
+                                        <input type="text" class="form-control" id="discountDisplay" readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label"><strong>Toplam</strong></label>
+                                        <input type="text" class="form-control fw-bold text-success" id="totalDisplay" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Teklifi Gönder
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        let requestsTable;
+        let currentRequestId = null;
+        let requestMaterials = [];
+
+        $(document).ready(function() {
+            checkAuth();
+            initDataTable();
+            loadRequests();
+            loadStats();
+            setupEventHandlers();
+        });
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('tedarik_user') || '{}');
+            if (!user.token || user.role !== 'supplier') {
+                window.location.href = '/login';
+                return;
+            }
+            
+            document.getElementById('supplierName').textContent = user.name || 'Tedarikçi';
+        }
+
+        function initDataTable() {
+            requestsTable = $('#requestsTable').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/tr.json'
+                },
+                pageLength: 25,
+                order: [[4, 'asc']], // Sort by deadline
+                columnDefs: [
+                    { targets: [6], orderable: false }
+                ],
+                dom: '<"row"<"col-sm-6"l><"col-sm-6"f>>rtip'
+            });
+        }
+
+        function loadStats() {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+            
+            fetch('/api/supplier/stats', {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('activeRequests').textContent = data.stats.activeRequests || 0;
+                    document.getElementById('submittedQuotations').textContent = data.stats.submittedQuotations || 0;
+                    document.getElementById('urgentRequests').textContent = data.stats.urgentRequests || 0;
+                }
+            })
+            .catch(error => {
+                console.error('Stats yükleme hatası:', error);
+            });
+        }
+
+        function loadRequests() {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+            
+            document.getElementById('loadingSpinner').style.display = 'block';
+            
+            fetch('/api/supplier/requests', {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                
+                if (data.success) {
+                    requestsTable.clear();
+                    
+                    data.requests.forEach(request => {
+                        const deadline = new Date(request.deadline);
+                        const now = new Date();
+                        const timeLeft = deadline - now;
+                        const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
+                        
+                        let deadlineClass = '';
+                        let deadlineText = deadline.toLocaleDateString('tr-TR');
+                        
+                        if (daysLeft < 0) {
+                            deadlineClass = 'text-danger';
+                            deadlineText += '<br><small class="text-danger">Süresi Doldu</small>';
+                        } else if (daysLeft <= 2) {
+                            deadlineClass = 'text-danger urgent-deadline';
+                            deadlineText += `<br><small class="text-danger">${daysLeft} gün kaldı</small>`;
+                        } else if (daysLeft <= 7) {
+                            deadlineClass = 'text-warning';
+                            deadlineText += `<br><small class="text-warning">${daysLeft} gün kaldı</small>`;
+                        }
+                        
+                        const hasSubmitted = request.has_quotation;
+                        const statusBadge = hasSubmitted ? 
+                            '<span class="badge bg-success">Teklif Verildi</span>' : 
+                            '<span class="badge bg-primary">Açık</span>';
+                        
+                        requestsTable.row.add([
+                            request.id,
+                            `<strong>${request.title}</strong><br><small class="text-muted">${request.description.substring(0, 60)}...</small>`,
+                            getCategoryName(request.category),
+                            new Date(request.published_at).toLocaleDateString('tr-TR'),
+                            `<span class="${deadlineClass}">${deadlineText}</span>`,
+                            statusBadge,
+                            `<div class="btn-group btn-group-sm">
+                                <button class="btn btn-info btn-sm" onclick="viewRequest(${request.id})" title="Görüntüle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                ${!hasSubmitted && daysLeft >= 0 ? `
+                                    <button class="btn btn-primary btn-sm" onclick="viewRequestAndQuote(${request.id})" title="Teklif Ver">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                ` : ''}
+                            </div>`
+                        ]);
+                    });
+                    
+                    requestsTable.draw();
+                    document.getElementById('requestsTable').style.display = 'table';
+                } else {
+                    Swal.fire('Hata!', data.message || 'Talepler yüklenemedi', 'error');
+                }
+            })
+            .catch(error => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                console.error('Talep yükleme hatası:', error);
+                Swal.fire('Hata!', 'Talepler yüklenirken bir hata oluştu', 'error');
+            });
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'metal': 'Metal İşleme',
+                'plastic': 'Plastik İmalat',
+                'electronics': 'Elektronik',
+                'textile': 'Tekstil',
+                'construction': 'İnşaat',
+                'other': 'Diğer'
+            };
+            return categories[category] || category;
+        }
+
+        function viewRequest(requestId) {
+            currentRequestId = requestId;
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+
+            fetch(`/api/supplier/requests/${requestId}`, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const request = data.request;
+                    
+                    // Fill modal with request data
+                    document.getElementById('requestTitle').value = request.title;
+                    document.getElementById('requestCategory').value = getCategoryName(request.category);
+                    document.getElementById('requestDescription').value = request.description;
+                    document.getElementById('deliveryLocation').value = request.delivery_location || '-';
+                    document.getElementById('paymentTerms').value = request.payment_terms || '-';
+                    document.getElementById('specialRequirements').value = request.special_requirements || '-';
+
+                    // Show deadline info
+                    const deadline = new Date(request.deadline);
+                    const now = new Date();
+                    const timeLeft = deadline - now;
+                    const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
+                    
+                    let deadlineHTML = `<strong>Son Teslim:</strong> ${deadline.toLocaleDateString('tr-TR')}<br>`;
+                    
+                    if (daysLeft < 0) {
+                        deadlineHTML += '<div class="deadline-critical"><i class="fas fa-exclamation-triangle me-2"></i>Süre dolmuş!</div>';
+                    } else if (daysLeft <= 2) {
+                        deadlineHTML += `<div class="deadline-critical"><i class="fas fa-clock me-2"></i>${daysLeft} gün kaldı - ACİL!</div>`;
+                    } else if (daysLeft <= 7) {
+                        deadlineHTML += `<div class="deadline-warning"><i class="fas fa-clock me-2"></i>${daysLeft} gün kaldı</div>`;
+                    } else {
+                        deadlineHTML += `<div class="text-success"><i class="fas fa-check-circle me-2"></i>${daysLeft} gün kaldı</div>`;
+                    }
+                    
+                    document.getElementById('deadlineInfo').innerHTML = deadlineHTML;
+
+                    // Load materials
+                    const materialsContainer = document.getElementById('requestMaterials');
+                    if (request.materials && request.materials.length > 0) {
+                        requestMaterials = request.materials;
+                        materialsContainer.innerHTML = request.materials.map(material => `
+                            <div class="material-item">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>${material.name}</strong>
+                                        <p class="text-muted mb-0">${material.description || 'Açıklama yok'}</p>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Miktar:</strong> ${material.quantity} ${material.unit || 'adet'}
+                                    </div>
+                                    <div class="col-md-3">
+                                        ${material.specifications ? `<strong>Özellik:</strong> ${material.specifications}` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        materialsContainer.innerHTML = '<p class="text-muted">Materyal bilgisi bulunmamaktadır.</p>';
+                        requestMaterials = [];
+                    }
+
+                    new bootstrap.Modal(document.getElementById('viewRequestModal')).show();
+                } else {
+                    Swal.fire('Hata!', data.message || 'Talep bilgileri yüklenemedi', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Talep detay yükleme hatası:', error);
+                Swal.fire('Hata!', 'Talep bilgileri yüklenirken bir hata oluştu', 'error');
+            });
+        }
+
+        function viewRequestAndQuote(requestId) {
+            viewRequest(requestId);
+        }
+
+        function openQuotationModal() {
+            if (!currentRequestId) {
+                Swal.fire('Hata!', 'Geçerli bir talep seçilmedi', 'error');
+                return;
+            }
+
+            // Close view modal and open quotation modal
+            bootstrap.Modal.getInstance(document.getElementById('viewRequestModal')).hide();
+            
+            // Set minimum date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.querySelector('input[name="validUntil"]').min = tomorrow.toISOString().split('T')[0];
+            
+            // Set request title
+            document.getElementById('quotationRequestTitle').textContent = document.getElementById('requestTitle').value;
+            
+            // Generate quotation items based on materials
+            generateQuotationItems();
+            
+            new bootstrap.Modal(document.getElementById('quotationModal')).show();
+        }
+
+        function generateQuotationItems() {
+            const container = document.getElementById('quotationItems');
+            
+            if (requestMaterials.length === 0) {
+                container.innerHTML = `
+                    <div class="mb-3">
+                        <label class="form-label">Ürün/Hizmet Adı <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="itemName" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Miktar <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control item-quantity" name="itemQuantity" min="1" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Birim</label>
+                            <input type="text" class="form-control" name="itemUnit" placeholder="adet, kg, m² vs.">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Birim Fiyat (₺) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control item-price" name="itemPrice" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = requestMaterials.map((material, index) => `
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0">${material.name}</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label class="form-label">Miktar</label>
+                                    <input type="number" class="form-control item-quantity" name="materials[${index}][quantity]" 
+                                           value="${material.quantity}" readonly>
+                                    <input type="hidden" name="materials[${index}][name]" value="${material.name}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Birim</label>
+                                    <input type="text" class="form-control" name="materials[${index}][unit]" 
+                                           value="${material.unit || 'adet'}" readonly>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Birim Fiyat (₺) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control item-price" name="materials[${index}][price]" 
+                                           min="0" step="0.01" required data-index="${index}">
+                                </div>
+                            </div>
+                            ${material.description ? `<div class="mt-2"><small class="text-muted">${material.description}</small></div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function setupEventHandlers() {
+            // Quotation form submission
+            document.getElementById('quotationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitQuotation();
+            });
+
+            // Price calculation
+            $(document).on('input', '.item-price, input[name="taxRate"], input[name="discountAmount"]', function() {
+                calculateTotal();
+            });
+
+            $(document).on('input', '.item-quantity', function() {
+                calculateTotal();
+            });
+        }
+
+        function calculateTotal() {
+            let subtotal = 0;
+            
+            // Calculate subtotal
+            document.querySelectorAll('.item-price').forEach((input, index) => {
+                const price = parseFloat(input.value) || 0;
+                const quantityInput = document.querySelector(`input[name="materials[${index}][quantity]"]`) || 
+                                    document.querySelector('.item-quantity');
+                const quantity = parseFloat(quantityInput.value) || 0;
+                subtotal += price * quantity;
+            });
+
+            // Get tax and discount
+            const taxRate = parseFloat(document.querySelector('input[name="taxRate"]').value) || 0;
+            const discountAmount = parseFloat(document.querySelector('input[name="discountAmount"]').value) || 0;
+
+            // Calculate tax
+            const taxAmount = (subtotal * taxRate) / 100;
+
+            // Calculate total
+            const total = subtotal + taxAmount - discountAmount;
+
+            // Update displays
+            document.getElementById('subtotalDisplay').value = `₺${formatNumber(subtotal)}`;
+            document.getElementById('taxDisplay').value = `₺${formatNumber(taxAmount)}`;
+            document.getElementById('discountDisplay').value = `₺${formatNumber(discountAmount)}`;
+            document.getElementById('totalDisplay').value = `₺${formatNumber(total)}`;
+        }
+
+        function formatNumber(number) {
+            return new Intl.NumberFormat('tr-TR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(number);
+        }
+
+        function submitQuotation() {
+            const formData = new FormData(document.getElementById('quotationForm'));
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+
+            // Prepare quotation data
+            const quotationData = {
+                requestId: currentRequestId,
+                validUntil: formData.get('validUntil'),
+                deliveryTime: formData.get('deliveryTime'),
+                taxRate: formData.get('taxRate'),
+                discountAmount: formData.get('discountAmount'),
+                paymentTerms: formData.get('paymentTerms'),
+                customPaymentTerms: formData.get('customPaymentTerms'),
+                notes: formData.get('notes'),
+                items: []
+            };
+
+            // Collect items
+            if (requestMaterials.length === 0) {
+                // Single item
+                quotationData.items.push({
+                    name: formData.get('itemName'),
+                    quantity: parseFloat(formData.get('itemQuantity')),
+                    unit: formData.get('itemUnit'),
+                    price: parseFloat(formData.get('itemPrice'))
+                });
+            } else {
+                // Multiple items based on materials
+                requestMaterials.forEach((material, index) => {
+                    const price = formData.get(`materials[${index}][price]`);
+                    if (price) {
+                        quotationData.items.push({
+                            name: material.name,
+                            quantity: material.quantity,
+                            unit: material.unit || 'adet',
+                            price: parseFloat(price)
+                        });
+                    }
+                });
+            }
+
+            const submitBtn = document.querySelector('#quotationModal .btn-primary');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Gönderiliyor...';
+            submitBtn.disabled = true;
+
+            fetch('/api/supplier/quotations', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(quotationData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Başarılı!', 'Teklifiniz başarıyla gönderildi', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('quotationModal')).hide();
+                    document.getElementById('quotationForm').reset();
+                    loadRequests();
+                    loadStats();
+                } else {
+                    Swal.fire('Hata!', data.message || 'Teklif gönderilemedi', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Teklif gönderme hatası:', error);
+                Swal.fire('Hata!', 'Teklif gönderilirken bir hata oluştu', 'error');
+            })
+            .finally(() => {
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Teklifi Gönder';
+                submitBtn.disabled = false;
+            });
+        }
+
+        function logout() {
+            Swal.fire({
+                title: 'Çıkış Yap',
+                text: 'Oturumu sonlandırmak istediğinizden emin misiniz?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Çık',
+                cancelButtonText: 'İptal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('tedarik_user');
+                    window.location.href = '/login';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tedarikçi Yönetimi | TMI Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0f0f23;
+            --secondary-color: #1a1a2e;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-light: #e4e6ea;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(15, 15, 35, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border-color);
+            min-height: calc(100vh - 76px);
+        }
+
+        .sidebar .nav-link {
+            color: var(--text-muted);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 4px 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .card {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            background: rgba(59, 130, 246, 0.1);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 15px 15px 0 0 !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            border: none;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+            border: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            border: none;
+        }
+
+        .table-dark {
+            background: rgba(26, 26, 46, 0.6);
+            border-color: var(--border-color);
+        }
+
+        .table-dark td, .table-dark th {
+            border-color: var(--border-color);
+            vertical-align: middle;
+        }
+
+        .badge {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge.bg-success {
+            background: linear-gradient(135deg, var(--success-color), #059669) !important;
+        }
+
+        .badge.bg-warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706) !important;
+        }
+
+        .badge.bg-danger {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626) !important;
+        }
+
+        .modal-content {
+            background: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+        }
+
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 10px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--accent-color);
+            color: var(--text-light);
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+        }
+
+        .stats-label {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .supplier-rating {
+            color: #fbbf24;
+        }
+
+        .activity-timeline {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: start;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 16px;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .dataTables_wrapper {
+            color: var(--text-light);
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 10px;
+            padding: 8px 12px;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 8px;
+        }
+
+        .page-link {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+        }
+
+        .page-link:hover {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .page-item.active .page-link {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/admin">
+                <i class="fas fa-shield-alt me-2"></i>TMI Admin Panel
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-2"></i>Admin
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="/admin/profile"><i class="fas fa-user me-2"></i>Profil</a></li>
+                        <li><a class="dropdown-item" href="/admin/settings"><i class="fas fa-cog me-2"></i>Ayarlar</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Çıkış</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar">
+                    <nav class="nav flex-column py-3">
+                        <a class="nav-link" href="/admin">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="/admin/requests">
+                            <i class="fas fa-clipboard-list me-2"></i>Talepler
+                        </a>
+                        <a class="nav-link active" href="/admin/suppliers">
+                            <i class="fas fa-building me-2"></i>Tedarikçiler
+                        </a>
+                        <a class="nav-link" href="/admin/quotations">
+                            <i class="fas fa-file-invoice me-2"></i>Teklifler
+                        </a>
+                        <a class="nav-link" href="/admin/reports">
+                            <i class="fas fa-chart-bar me-2"></i>Raporlar
+                        </a>
+                        <a class="nav-link" href="/admin/settings">
+                            <i class="fas fa-cog me-2"></i>Ayarlar
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="main-content">
+                    <!-- Page Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="mb-1">
+                                <i class="fas fa-building me-3"></i>Tedarikçi Yönetimi
+                            </h2>
+                            <p class="text-muted mb-0">Tüm tedarikçileri görüntüleyin, onaylayın ve yönetin</p>
+                        </div>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inviteSupplierModal">
+                            <i class="fas fa-user-plus me-2"></i>Tedarikçi Davet Et
+                        </button>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div class="stats-number" id="totalSuppliers">0</div>
+                                <div class="stats-label">Toplam Tedarikçi</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stats-number" id="activeSuppliers">0</div>
+                                <div class="stats-label">Aktif Tedarikçi</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stats-number" id="pendingSuppliers">0</div>
+                                <div class="stats-label">Bekleyen Onay</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="stats-number" id="avgRating">0.0</div>
+                                <div class="stats-label">Ort. Değerlendirme</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suppliers Table -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>Tedarikçi Listesi
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="loading-spinner" id="loadingSpinner">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                                <p class="mt-2">Tedarikçiler yükleniyor...</p>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table id="suppliersTable" class="table table-dark table-hover" style="display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Şirket Adı</th>
+                                            <th>Yetkili</th>
+                                            <th>Email</th>
+                                            <th>Telefon</th>
+                                            <th>Kategori</th>
+                                            <th>Değerlendirme</th>
+                                            <th>Durum</th>
+                                            <th>Kayıt Tarihi</th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data will be loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invite Supplier Modal -->
+    <div class="modal fade" id="inviteSupplierModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-user-plus me-2"></i>Tedarikçi Davet Et
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="inviteSupplierForm">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Şirket Adı <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="companyName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Yetkili Adı <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="contactName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Telefon</label>
+                            <input type="tel" class="form-control" name="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Kategori <span class="text-danger">*</span></label>
+                            <select class="form-select" name="category" required>
+                                <option value="">Kategori Seçin</option>
+                                <option value="metal">Metal İşleme</option>
+                                <option value="plastic">Plastik İmalat</option>
+                                <option value="electronics">Elektronik</option>
+                                <option value="textile">Tekstil</option>
+                                <option value="construction">İnşaat</option>
+                                <option value="other">Diğer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Açıklama</label>
+                            <textarea class="form-control" name="description" rows="3" placeholder="Tedarikçi hakkında not..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Davet Gönder
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Supplier Modal -->
+    <div class="modal fade" id="viewSupplierModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-eye me-2"></i>Tedarikçi Detayları
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Genel Bilgiler</h6>
+                            <table class="table table-dark table-sm">
+                                <tr><td>Şirket Adı:</td><td id="viewCompanyName"></td></tr>
+                                <tr><td>Yetkili:</td><td id="viewContactName"></td></tr>
+                                <tr><td>Email:</td><td id="viewEmail"></td></tr>
+                                <tr><td>Telefon:</td><td id="viewPhone"></td></tr>
+                                <tr><td>Kategori:</td><td id="viewCategory"></td></tr>
+                                <tr><td>Kayıt Tarihi:</td><td id="viewRegisterDate"></td></tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">İstatistikler</h6>
+                            <table class="table table-dark table-sm">
+                                <tr><td>Toplam Teklif:</td><td id="viewTotalQuotations"></td></tr>
+                                <tr><td>Kabul Edilen:</td><td id="viewAcceptedQuotations"></td></tr>
+                                <tr><td>Kazanma Oranı:</td><td id="viewWinRate"></td></tr>
+                                <tr><td>Değerlendirme:</td><td id="viewRating"></td></tr>
+                                <tr><td>Son Aktivite:</td><td id="viewLastActivity"></td></tr>
+                                <tr><td>Durum:</td><td id="viewStatus"></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <h6 class="text-primary mt-4 mb-3">Son Aktiviteler</h6>
+                    <div class="activity-timeline" id="supplierActivities">
+                        <!-- Activities will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-warning" onclick="editSupplier()">
+                        <i class="fas fa-edit me-2"></i>Düzenle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        let suppliersTable;
+        let currentSupplierId = null;
+
+        $(document).ready(function() {
+            checkAuth();
+            initDataTable();
+            loadSuppliers();
+            loadStats();
+            setupEventHandlers();
+        });
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('tedarik_user') || '{}');
+            if (!user.token || user.role !== 'admin') {
+                window.location.href = '/login';
+                return;
+            }
+        }
+
+        function initDataTable() {
+            suppliersTable = $('#suppliersTable').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/tr.json'
+                },
+                pageLength: 25,
+                order: [[8, 'desc']], // Sort by register date
+                columnDefs: [
+                    { targets: [9], orderable: false }
+                ],
+                dom: '<"row"<"col-sm-6"l><"col-sm-6"f>>rtip'
+            });
+        }
+
+        function loadStats() {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+            
+            fetch('/api/admin/supplier-stats', {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('totalSuppliers').textContent = data.stats.total || 0;
+                    document.getElementById('activeSuppliers').textContent = data.stats.active || 0;
+                    document.getElementById('pendingSuppliers').textContent = data.stats.pending || 0;
+                    document.getElementById('avgRating').textContent = (data.stats.avgRating || 0).toFixed(1);
+                }
+            })
+            .catch(error => {
+                console.error('Stats yükleme hatası:', error);
+            });
+        }
+
+        function loadSuppliers() {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+            
+            document.getElementById('loadingSpinner').style.display = 'block';
+            
+            fetch('/api/admin/suppliers', {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                
+                if (data.success) {
+                    suppliersTable.clear();
+                    
+                    data.suppliers.forEach(supplier => {
+                        const statusBadge = getStatusBadge(supplier.status);
+                        const ratingStars = getRatingStars(supplier.rating || 0);
+                        const registerDate = new Date(supplier.created_at).toLocaleDateString('tr-TR');
+                        
+                        suppliersTable.row.add([
+                            supplier.id,
+                            `<strong>${supplier.company_name}</strong>`,
+                            supplier.contact_name,
+                            `<a href="mailto:${supplier.email}" class="text-info">${supplier.email}</a>`,
+                            supplier.phone || '-',
+                            getCategoryName(supplier.category),
+                            ratingStars,
+                            statusBadge,
+                            registerDate,
+                            `<div class="btn-group btn-group-sm">
+                                <button class="btn btn-info btn-sm" onclick="viewSupplier(${supplier.id})" title="Görüntüle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                ${supplier.status === 'pending' ? `
+                                    <button class="btn btn-success btn-sm" onclick="approveSupplier(${supplier.id})" title="Onayla">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="rejectSupplier(${supplier.id})" title="Reddet">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                ` : `
+                                    <button class="btn btn-warning btn-sm" onclick="editSupplier(${supplier.id})" title="Düzenle">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    ${supplier.status === 'active' ? `
+                                        <button class="btn btn-secondary btn-sm" onclick="deactivateSupplier(${supplier.id})" title="Pasif Yap">
+                                            <i class="fas fa-pause"></i>
+                                        </button>
+                                    ` : `
+                                        <button class="btn btn-success btn-sm" onclick="activateSupplier(${supplier.id})" title="Aktif Yap">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                    `}
+                                `}
+                            </div>`
+                        ]);
+                    });
+                    
+                    suppliersTable.draw();
+                    document.getElementById('suppliersTable').style.display = 'table';
+                } else {
+                    Swal.fire('Hata!', data.message || 'Tedarikçiler yüklenemedi', 'error');
+                }
+            })
+            .catch(error => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                console.error('Tedarikçi yükleme hatası:', error);
+                Swal.fire('Hata!', 'Tedarikçiler yüklenirken bir hata oluştu', 'error');
+            });
+        }
+
+        function getStatusBadge(status) {
+            const statusMap = {
+                'active': '<span class="badge bg-success">Aktif</span>',
+                'inactive': '<span class="badge bg-secondary">Pasif</span>',
+                'pending': '<span class="badge bg-warning">Bekliyor</span>',
+                'rejected': '<span class="badge bg-danger">Reddedildi</span>'
+            };
+            return statusMap[status] || '<span class="badge bg-secondary">Bilinmiyor</span>';
+        }
+
+        function getRatingStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star supplier-rating"></i>';
+                } else {
+                    stars += '<i class="far fa-star text-muted"></i>';
+                }
+            }
+            return `${stars} <small class="text-muted">(${rating.toFixed(1)})</small>`;
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'metal': 'Metal İşleme',
+                'plastic': 'Plastik İmalat',
+                'electronics': 'Elektronik',
+                'textile': 'Tekstil',
+                'construction': 'İnşaat',
+                'other': 'Diğer'
+            };
+            return categories[category] || category;
+        }
+
+        function setupEventHandlers() {
+            // Invite supplier form
+            document.getElementById('inviteSupplierForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                inviteSupplier();
+            });
+        }
+
+        function inviteSupplier() {
+            const formData = new FormData(document.getElementById('inviteSupplierForm'));
+            const data = Object.fromEntries(formData);
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+
+            const submitBtn = document.querySelector('#inviteSupplierModal .btn-primary');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Gönderiliyor...';
+            submitBtn.disabled = true;
+
+            fetch('/api/admin/invite-supplier', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Başarılı!', 'Tedarikçi daveti gönderildi', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('inviteSupplierModal')).hide();
+                    document.getElementById('inviteSupplierForm').reset();
+                    loadSuppliers();
+                    loadStats();
+                } else {
+                    Swal.fire('Hata!', data.message || 'Davet gönderilemedi', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Davet gönderme hatası:', error);
+                Swal.fire('Hata!', 'Davet gönderilirken bir hata oluştu', 'error');
+            })
+            .finally(() => {
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Davet Gönder';
+                submitBtn.disabled = false;
+            });
+        }
+
+        function viewSupplier(supplierId) {
+            currentSupplierId = supplierId;
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+
+            fetch(`/api/admin/suppliers/${supplierId}`, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const supplier = data.supplier;
+                    
+                    // Fill modal with supplier data
+                    document.getElementById('viewCompanyName').textContent = supplier.company_name;
+                    document.getElementById('viewContactName').textContent = supplier.contact_name;
+                    document.getElementById('viewEmail').innerHTML = `<a href="mailto:${supplier.email}" class="text-info">${supplier.email}</a>`;
+                    document.getElementById('viewPhone').textContent = supplier.phone || '-';
+                    document.getElementById('viewCategory').textContent = getCategoryName(supplier.category);
+                    document.getElementById('viewRegisterDate').textContent = new Date(supplier.created_at).toLocaleDateString('tr-TR');
+                    document.getElementById('viewTotalQuotations').textContent = supplier.total_quotations || 0;
+                    document.getElementById('viewAcceptedQuotations').textContent = supplier.accepted_quotations || 0;
+                    document.getElementById('viewWinRate').textContent = supplier.win_rate ? `${supplier.win_rate}%` : '-';
+                    document.getElementById('viewRating').innerHTML = getRatingStars(supplier.rating || 0);
+                    document.getElementById('viewLastActivity').textContent = supplier.last_activity ? new Date(supplier.last_activity).toLocaleDateString('tr-TR') : '-';
+                    document.getElementById('viewStatus').innerHTML = getStatusBadge(supplier.status);
+
+                    // Load activities
+                    loadSupplierActivities(supplierId);
+
+                    new bootstrap.Modal(document.getElementById('viewSupplierModal')).show();
+                } else {
+                    Swal.fire('Hata!', data.message || 'Tedarikçi bilgileri yüklenemedi', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Tedarikçi detay yükleme hatası:', error);
+                Swal.fire('Hata!', 'Tedarikçi bilgileri yüklenirken bir hata oluştu', 'error');
+            });
+        }
+
+        function loadSupplierActivities(supplierId) {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+
+            fetch(`/api/admin/suppliers/${supplierId}/activities`, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('supplierActivities');
+                
+                if (data.success && data.activities.length > 0) {
+                    container.innerHTML = data.activities.map(activity => `
+                        <div class="timeline-item">
+                            <div class="timeline-icon bg-${getActivityColor(activity.type)} text-white">
+                                <i class="fas ${getActivityIcon(activity.type)}"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">${activity.title}</h6>
+                                <p class="text-muted mb-1">${activity.description}</p>
+                                <small class="text-muted">${new Date(activity.created_at).toLocaleString('tr-TR')}</small>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p class="text-muted text-center">Henüz aktivite bulunmamaktadır.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Aktivite yükleme hatası:', error);
+                document.getElementById('supplierActivities').innerHTML = '<p class="text-danger text-center">Aktiviteler yüklenirken hata oluştu</p>';
+            });
+        }
+
+        function getActivityColor(type) {
+            const colors = {
+                'quotation': 'primary',
+                'approval': 'success',
+                'rejection': 'danger',
+                'registration': 'info',
+                'update': 'warning'
+            };
+            return colors[type] || 'secondary';
+        }
+
+        function getActivityIcon(type) {
+            const icons = {
+                'quotation': 'fa-file-invoice',
+                'approval': 'fa-check',
+                'rejection': 'fa-times',
+                'registration': 'fa-user-plus',
+                'update': 'fa-edit'
+            };
+            return icons[type] || 'fa-info';
+        }
+
+        function approveSupplier(supplierId) {
+            Swal.fire({
+                title: 'Tedarikçiyi Onayla',
+                text: 'Bu tedarikçiyi onaylamak istediğinizden emin misiniz?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Onayla',
+                cancelButtonText: 'İptal',
+                confirmButtonColor: '#10b981'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    updateSupplierStatus(supplierId, 'active', 'Tedarikçi başarıyla onaylandı');
+                }
+            });
+        }
+
+        function rejectSupplier(supplierId) {
+            Swal.fire({
+                title: 'Tedarikçiyi Reddet',
+                text: 'Bu tedarikçiyi reddetmek istediğinizden emin misiniz?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Reddet',
+                cancelButtonText: 'İptal',
+                confirmButtonColor: '#ef4444'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    updateSupplierStatus(supplierId, 'rejected', 'Tedarikçi reddedildi');
+                }
+            });
+        }
+
+        function activateSupplier(supplierId) {
+            updateSupplierStatus(supplierId, 'active', 'Tedarikçi aktif hale getirildi');
+        }
+
+        function deactivateSupplier(supplierId) {
+            updateSupplierStatus(supplierId, 'inactive', 'Tedarikçi pasif hale getirildi');
+        }
+
+        function updateSupplierStatus(supplierId, status, successMessage) {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+
+            fetch(`/api/admin/suppliers/${supplierId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Başarılı!', successMessage, 'success');
+                    loadSuppliers();
+                    loadStats();
+                } else {
+                    Swal.fire('Hata!', data.message || 'İşlem gerçekleştirilemedi', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Durum güncelleme hatası:', error);
+                Swal.fire('Hata!', 'Durum güncellenirken bir hata oluştu', 'error');
+            });
+        }
+
+        function editSupplier(supplierId) {
+            // This would open an edit modal - implement as needed
+            Swal.fire('Bilgi', 'Düzenleme özelliği yakında eklenecek', 'info');
+        }
+
+        function logout() {
+            Swal.fire({
+                title: 'Çıkış Yap',
+                text: 'Oturumu sonlandırmak istediğinizden emin misiniz?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Çık',
+                cancelButtonText: 'İptal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('tedarik_user');
+                    window.location.href = '/login';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

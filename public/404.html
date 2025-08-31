@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Sayfa Bulunamadı | TMI Tedarik Zinciri</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e4e6ea;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .error-container {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        .error-code {
+            font-size: 120px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .error-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .error-description {
+            font-size: 18px;
+            color: #a8b3cf;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e4e6ea;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .error-icon {
+            position: absolute;
+            top: 20%;
+            left: 10%;
+            font-size: 200px;
+            color: rgba(59, 130, 246, 0.05);
+            z-index: -1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(5deg); }
+            66% { transform: translateY(15px) rotate(-5deg); }
+        }
+
+        .back-link {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            color: #a8b3cf;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #3b82f6;
+        }
+
+        .suggestions {
+            margin-top: 50px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .suggestions h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .suggestion-list {
+            list-style: none;
+            text-align: left;
+        }
+
+        .suggestion-list li {
+            padding: 8px 0;
+            color: #a8b3cf;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .suggestion-list li i {
+            color: #3b82f6;
+            width: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 80px;
+            }
+
+            .error-title {
+                font-size: 24px;
+            }
+
+            .error-description {
+                font-size: 16px;
+            }
+
+            .error-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .back-link {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 20px;
+                justify-content: center;
+            }
+
+            .error-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+    </div>
+
+    <a href="javascript:history.back()" class="back-link">
+        <i class="fas fa-arrow-left"></i>
+        Geri Dön
+    </a>
+
+    <div class="error-container">
+        <div class="error-code">404</div>
+        <h1 class="error-title">Sayfa Bulunamadı</h1>
+        <p class="error-description">
+            Üzgünüz, aradığınız sayfa mevcut değil veya taşınmış olabilir. 
+            Lütfen URL'yi kontrol edin veya ana sayfaya dönün.
+        </p>
+
+        <div class="error-actions">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i>
+                Ana Sayfa
+            </a>
+            <a href="/login" class="btn btn-secondary">
+                <i class="fas fa-sign-in-alt"></i>
+                Giriş Yap
+            </a>
+        </div>
+
+        <div class="suggestions">
+            <h3><i class="fas fa-lightbulb me-2"></i>Size Yardımcı Olabilecek Linkler:</h3>
+            <ul class="suggestion-list">
+                <li>
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin paneli için: <strong>/admin</strong></span>
+                </li>
+                <li>
+                    <i class="fas fa-building"></i>
+                    <span>Tedarikçi portalı için: <strong>/supplier</strong></span>
+                </li>
+                <li>
+                    <i class="fas fa-user-plus"></i>
+                    <span>Tedarikçi kaydı için: <strong>/register</strong></span>
+                </li>
+                <li>
+                    <i class="fas fa-info-circle"></i>
+                    <span>Sistem durumu için: <strong>/api/health</strong></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Auto redirect after 30 seconds
+        let countdown = 30;
+        
+        function updateCountdown() {
+            if (countdown > 0) {
+                countdown--;
+                if (countdown === 0) {
+                    window.location.href = '/';
+                }
+            }
+        }
+
+        // Start countdown
+        setInterval(updateCountdown, 1000);
+
+        // Check if user is logged in and suggest appropriate page
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = localStorage.getItem('tedarik_user');
+            if (user) {
+                const userData = JSON.parse(user);
+                const suggestions = document.querySelector('.suggestion-list');
+                
+                if (userData.role === 'admin') {
+                    suggestions.innerHTML = `
+                        <li><i class="fas fa-tachometer-alt"></i><a href="/admin" style="color: #3b82f6; text-decoration: none;">Admin Dashboard'a git</a></li>
+                        <li><i class="fas fa-clipboard-list"></i><a href="/admin/requests" style="color: #3b82f6; text-decoration: none;">Talepleri görüntüle</a></li>
+                        <li><i class="fas fa-building"></i><a href="/admin/suppliers" style="color: #3b82f6; text-decoration: none;">Tedarikçileri yönet</a></li>
+                    `;
+                } else if (userData.role === 'supplier') {
+                    suggestions.innerHTML = `
+                        <li><i class="fas fa-tachometer-alt"></i><a href="/supplier" style="color: #3b82f6; text-decoration: none;">Tedarikçi Dashboard'a git</a></li>
+                        <li><i class="fas fa-clipboard-list"></i><a href="/supplier/requests" style="color: #3b82f6; text-decoration: none;">Aktif talepleri gör</a></li>
+                        <li><i class="fas fa-file-invoice"></i><a href="/supplier/quotations" style="color: #3b82f6; text-decoration: none;">Teklif geçmişini gör</a></li>
+                    `;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

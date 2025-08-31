@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TMI Tedarik Zinciri</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #8b5cf6;
+            --success-color: #06d6a0;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1e293b;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(135deg, var(--dark-color) 0%, #334155 100%);
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .sidebar-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-subtitle {
+            color: #94a3b8;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            color: #64748b;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 25px 10px;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            margin-bottom: 2px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin: 0;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-refresh {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-refresh:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card.primary { border-left-color: var(--primary-color); }
+        .stat-card.success { border-left-color: var(--success-color); }
+        .stat-card.warning { border-left-color: var(--warning-color); }
+        .stat-card.danger { border-left-color: var(--danger-color); }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-icon.primary { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); }
+        .stat-icon.success { background: linear-gradient(135deg, var(--success-color), #10b981); }
+        .stat-icon.warning { background: linear-gradient(135deg, var(--warning-color), #f97316); }
+        .stat-icon.danger { background: linear-gradient(135deg, var(--danger-color), #dc2626); }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            color: var(--danger-color);
+        }
+
+        /* Charts */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .chart-period {
+            background: #f1f5f9;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+
+        /* Recent Activity */
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+            margin-right: 15px;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .activity-description {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .activity-time {
+            color: #94a3b8;
+            font-size: 11px;
+            text-align: right;
+            min-width: 60px;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px;
+            color: #64748b;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f1f5f9;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-industry"></i>
+            </div>
+            <div class="sidebar-title">TMI Admin</div>
+            <div class="sidebar-subtitle">Tedarik Zinciri</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Ana Menü</div>
+                <div class="nav-item">
+                    <a href="/admin" class="nav-link active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/requests" class="nav-link">
+                        <i class="fas fa-clipboard-list"></i>
+                        Talepler
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/suppliers" class="nav-link">
+                        <i class="fas fa-building"></i>
+                        Tedarikçiler
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/quotations" class="nav-link">
+                        <i class="fas fa-file-invoice"></i>
+                        Teklifler
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Analitik</div>
+                <div class="nav-item">
+                    <a href="/admin/reports" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        Raporlar
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="/admin/analytics" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        Analizler
+                    </a>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Sistem</div>
+                <div class="nav-item">
+                    <a href="/admin/settings" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        Ayarlar
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Çıkış
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <h1 class="topbar-title">Dashboard</h1>
+            <div class="topbar-actions">
+                <span id="lastUpdate" class="text-muted small"></span>
+                <button class="btn-refresh" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt"></i>
+                    Yenile
+                </button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Dashboard yükleniyor...</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="statsGrid" style="display: none;">
+                <div class="stat-card primary">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-number" id="totalRequests">-</div>
+                            <div class="stat-label">Toplam Talep</div>
+                            <div class="stat-change positive" id="requestsChange">-</div>
+                        </div>
+                        <div class="stat-icon primary">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-number" id="activeRequests">-</div>
+                            <div class="stat-label">Aktif Talep</div>
+                            <div class="stat-change positive" id="activeRequestsChange">-</div>
+                        </div>
+                        <div class="stat-icon success">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-number" id="totalSuppliers">-</div>
+                            <div class="stat-label">Tedarikçi</div>
+                            <div class="stat-change positive" id="suppliersChange">-</div>
+                        </div>
+                        <div class="stat-icon warning">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card danger">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-number" id="pendingApprovals">-</div>
+                            <div class="stat-label">Onay Bekleyen</div>
+                            <div class="stat-change negative" id="approvalsChange">-</div>
+                        </div>
+                        <div class="stat-icon danger">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="chart-grid" id="chartsGrid" style="display: none;">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Talep Trendi</h3>
+                        <select class="chart-period" id="trendPeriod">
+                            <option value="7">Son 7 Gün</option>
+                            <option value="30" selected>Son 30 Gün</option>
+                            <option value="90">Son 90 Gün</option>
+                        </select>
+                    </div>
+                    <canvas id="trendChart" height="300"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Son Aktiviteler</h3>
+                    </div>
+                    <div class="activity-list" id="activityList">
+                        <!-- Activities will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let trendChart;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadDashboard();
+        });
+
+        // Check authentication
+        function checkAuth() {
+            const user = localStorage.getItem('tedarik_user');
+            if (!user) {
+                window.location.href = '/login';
+                return;
+            }
+
+            const userData = JSON.parse(user);
+            if (userData.role !== 'admin') {
+                alert('Admin yetkisi gerekli!');
+                window.location.href = '/login';
+                return;
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            showLoading(true);
+
+            try {
+                const response = await fetch('/api/admin/dashboard', {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Dashboard yüklenemedi');
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStats(data.dashboard.stats);
+                    updateRecentActivity(data.dashboard.recent_activity);
+                    initTrendChart(data.dashboard.recent_activity);
+                    updateLastRefresh();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Dashboard error:', error);
+                alert('Dashboard yüklenirken hata oluştu: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Update statistics
+        function updateStats(stats) {
+            document.getElementById('totalRequests').textContent = stats.total_requests?.count || 0;
+            document.getElementById('activeRequests').textContent = stats.active_requests?.count || 0;
+            document.getElementById('totalSuppliers').textContent = stats.total_suppliers?.count || 0;
+            document.getElementById('pendingApprovals').textContent = stats.pending_approvals?.count || 0;
+
+            // Simulate changes (in real app, calculate from data)
+            document.getElementById('requestsChange').innerHTML = '<i class="fas fa-arrow-up"></i> +12%';
+            document.getElementById('activeRequestsChange').innerHTML = '<i class="fas fa-arrow-up"></i> +8%';
+            document.getElementById('suppliersChange').innerHTML = '<i class="fas fa-arrow-up"></i> +5%';
+            document.getElementById('approvalsChange').innerHTML = '<i class="fas fa-arrow-down"></i> -3%';
+        }
+
+        // Update recent activity
+        function updateRecentActivity(activities) {
+            const activityList = document.getElementById('activityList');
+            
+            if (!activities || !Array.isArray(activities) || activities.length === 0) {
+                activityList.innerHTML = '<div class="text-center text-muted py-4">Henüz aktivite yok</div>';
+                return;
+            }
+
+            activityList.innerHTML = activities.slice(0, 10).map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon ${getActivityIconClass(activity.type)}">
+                        <i class="fas fa-${getActivityIcon(activity.type)}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title || 'Yeni Aktivite'}</div>
+                        <div class="activity-description">${activity.action || 'Detay yok'}</div>
+                    </div>
+                    <div class="activity-time">${formatRelativeTime(activity.date)}</div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize trend chart
+        function initTrendChart(data) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            console.log('initTrendChart called with data:', data);
+            
+            // Destroy existing chart if it exists
+            if (trendChart) {
+                trendChart.destroy();
+            }
+            
+            // Simulate chart data (in real app, process actual data)
+            const chartData = {
+                labels: ['Son 30 Gün', 'Son 25 Gün', 'Son 20 Gün', 'Son 15 Gün', 'Son 10 Gün', 'Son 5 Gün', 'Bugün'],
+                datasets: [
+                    {
+                        label: 'Yeni Talepler',
+                        data: [12, 15, 8, 22, 18, 25, 14],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Alınan Teklifler',
+                        data: [8, 12, 6, 18, 14, 20, 11],
+                        borderColor: '#06d6a0',
+                        backgroundColor: 'rgba(6, 214, 160, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            };
+
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#f1f5f9'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: '#f1f5f9'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            const stats = document.getElementById('statsGrid');
+            const charts = document.getElementById('chartsGrid');
+
+            console.log('showLoading called with:', show, 'charts element:', charts);
+
+            if (show) {
+                loading.classList.add('show');
+                stats.style.display = 'none';
+                charts.style.display = 'none';
+            } else {
+                loading.classList.remove('show');
+                stats.style.display = 'grid';
+                charts.style.display = 'grid';
+                console.log('Charts display set to grid, current style:', charts.style.display);
+            }
+        }
+
+        function refreshDashboard() {
+            loadDashboard();
+        }
+
+        function updateLastRefresh() {
+            document.getElementById('lastUpdate').textContent = 
+                'Son güncelleme: ' + new Date().toLocaleTimeString('tr-TR');
+        }
+
+        // Helper functions for activities
+        function getActivityIcon(type) {
+            const icons = {
+                'request': 'clipboard-list',
+                'quotation': 'file-invoice',
+                'supplier': 'building'
+            };
+            return icons[type] || 'info';
+        }
+
+        function getActivityIconClass(type) {
+            const classes = {
+                'request': 'primary',
+                'quotation': 'success', 
+                'supplier': 'warning'
+            };
+            return classes[type] || 'primary';
+        }
+
+        function formatRelativeTime(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return 'Şimdi';
+            if (diffMins < 60) return diffMins + 'd';
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return diffHours + 's';
+            
+            const diffDays = Math.floor(diffHours / 24);
+            return diffDays + 'g';
+        }
+
+        function logout() {
+            if (confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
+                localStorage.removeItem('tedarik_user');
+                localStorage.removeItem('tedarik_token');
+                
+                fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                }).finally(() => {
+                    window.location.href = '/login';
+                });
+            }
+        }
+
+        // Period change handler
+        document.getElementById('trendPeriod').addEventListener('change', function() {
+            // In real app, reload chart data for selected period
+            console.log('Period changed to:', this.value);
+        });
+
+        // Auto refresh every 5 minutes
+        setInterval(refreshDashboard, 300000);
+    </script>
+</body>
+</html>

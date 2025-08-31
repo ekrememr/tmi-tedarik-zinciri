@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teklif Yönetimi | TMI Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0f0f23;
+            --secondary-color: #1a1a2e;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-light: #e4e6ea;
+            --text-muted: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(15, 15, 35, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border-color);
+            min-height: calc(100vh - 76px);
+        }
+
+        .sidebar .nav-link {
+            color: var(--text-muted);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 4px 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .card {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            background: rgba(59, 130, 246, 0.1);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 15px 15px 0 0 !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            border: none;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+            border: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            border: none;
+        }
+
+        .table-dark {
+            background: rgba(26, 26, 46, 0.6);
+            border-color: var(--border-color);
+        }
+
+        .table-dark td, .table-dark th {
+            border-color: var(--border-color);
+            vertical-align: middle;
+        }
+
+        .badge {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge.bg-success {
+            background: linear-gradient(135deg, var(--success-color), #059669) !important;
+        }
+
+        .badge.bg-warning {
+            background: linear-gradient(135deg, var(--warning-color), #d97706) !important;
+        }
+
+        .badge.bg-danger {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626) !important;
+        }
+
+        .badge.bg-primary {
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6) !important;
+        }
+
+        .badge.bg-secondary {
+            background: linear-gradient(135deg, #6b7280, #4b5563) !important;
+        }
+
+        .modal-content {
+            background: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+        }
+
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 10px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--accent-color);
+            color: var(--text-light);
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .stats-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+        }
+
+        .stats-label {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .comparison-card {
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .comparison-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .comparison-card.winner {
+            border-color: var(--success-color);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .comparison-header {
+            background: rgba(59, 130, 246, 0.1);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-body {
+            padding: 20px;
+        }
+
+        .price-highlight {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--success-color);
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .dataTables_wrapper {
+            color: var(--text-light);
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 10px;
+            padding: 8px 12px;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 8px;
+        }
+
+        .page-link {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+        }
+
+        .page-link:hover {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .page-item.active .page-link {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .filter-tabs {
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-tabs .nav-pills .nav-link {
+            color: var(--text-muted);
+            background: transparent;
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-tabs .nav-pills .nav-link.active {
+            background: var(--accent-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/admin">
+                <i class="fas fa-shield-alt me-2"></i>TMI Admin Panel
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-2"></i>Admin
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="/admin/profile"><i class="fas fa-user me-2"></i>Profil</a></li>
+                        <li><a class="dropdown-item" href="/admin/settings"><i class="fas fa-cog me-2"></i>Ayarlar</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Çıkış</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar">
+                    <nav class="nav flex-column py-3">
+                        <a class="nav-link" href="/admin">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="/admin/requests">
+                            <i class="fas fa-clipboard-list me-2"></i>Talepler
+                        </a>
+                        <a class="nav-link" href="/admin/suppliers">
+                            <i class="fas fa-building me-2"></i>Tedarikçiler
+                        </a>
+                        <a class="nav-link active" href="/admin/quotations">
+                            <i class="fas fa-file-invoice me-2"></i>Teklifler
+                        </a>
+                        <a class="nav-link" href="/admin/reports">
+                            <i class="fas fa-chart-bar me-2"></i>Raporlar
+                        </a>
+                        <a class="nav-link" href="/admin/settings">
+                            <i class="fas fa-cog me-2"></i>Ayarlar
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="main-content">
+                    <!-- Page Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="mb-1">
+                                <i class="fas fa-file-invoice me-3"></i>Teklif Yönetimi
+                            </h2>
+                            <p class="text-muted mb-0">Tüm teklifleri görüntüleyin, karşılaştırın ve kazanan belirleyin</p>
+                        </div>
+                    </div>
+
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-file-invoice"></i>
+                                </div>
+                                <div class="stats-number" id="totalQuotations">0</div>
+                                <div class="stats-label">Toplam Teklif</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stats-number" id="pendingQuotations">0</div>
+                                <div class="stats-label">Bekleyen Teklif</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div class="stats-number" id="acceptedQuotations">0</div>
+                                <div class="stats-label">Kazanan Teklif</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="stats-icon">
+                                    <i class="fas fa-lira-sign"></i>
+                                </div>
+                                <div class="stats-number" id="totalValue">₺0</div>
+                                <div class="stats-label">Toplam Değer</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Tabs -->
+                    <div class="filter-tabs">
+                        <ul class="nav nav-pills justify-content-center">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-filter="all" href="#all">
+                                    <i class="fas fa-list me-2"></i>Tümü
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-filter="pending" href="#pending">
+                                    <i class="fas fa-clock me-2"></i>Bekleyen
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-filter="under_review" href="#under_review">
+                                    <i class="fas fa-eye me-2"></i>İncelemede
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-filter="accepted" href="#accepted">
+                                    <i class="fas fa-check me-2"></i>Kabul Edilen
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-filter="rejected" href="#rejected">
+                                    <i class="fas fa-times me-2"></i>Reddedilen
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Quotations Table -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list me-2"></i>Teklif Listesi
+                            </h5>
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-download me-2"></i>Dışa Aktar
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark">
+                                    <li><a class="dropdown-item" href="#" onclick="exportQuotations('excel')">
+                                        <i class="fas fa-file-excel me-2"></i>Excel
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="exportQuotations('pdf')">
+                                        <i class="fas fa-file-pdf me-2"></i>PDF
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="loading-spinner" id="loadingSpinner">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Yükleniyor...</span>
+                                </div>
+                                <p class="mt-2">Teklifler yükleniyor...</p>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table id="quotationsTable" class="table table-dark table-hover" style="display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Talep</th>
+                                            <th>Tedarikçi</th>
+                                            <th>Teklif Tarihi</th>
+                                            <th>Son Tarih</th>
+                                            <th>Toplam Fiyat</th>
+                                            <th>Durum</th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data will be loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Quotation Modal -->
+    <div class="modal fade" id="viewQuotationModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-eye me-2"></i>Teklif Detayları
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Teklif Bilgileri</h6>
+                            <table class="table table-dark table-sm">
+                                <tr><td>Teklif ID:</td><td id="quotationId"></td></tr>
+                                <tr><td>Tedarikçi:</td><td id="quotationSupplier"></td></tr>
+                                <tr><td>Talep:</td><td id="quotationRequest"></td></tr>
+                                <tr><td>Teklif Tarihi:</td><td id="quotationDate"></td></tr>
+                                <tr><td>Geçerlilik:</td><td id="quotationValidity"></td></tr>
+                                <tr><td>Teslimat Süresi:</td><td id="deliveryTime"></td></tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Fiyat Bilgileri</h6>
+                            <table class="table table-dark table-sm">
+                                <tr><td>Ara Toplam:</td><td id="subtotal"></td></tr>
+                                <tr><td>KDV:</td><td id="taxAmount"></td></tr>
+                                <tr><td>İndirim:</td><td id="discount"></td></tr>
+                                <tr><td class="fw-bold">Toplam:</td><td class="fw-bold text-success" id="totalAmount"></td></tr>
+                                <tr><td>Ödeme Koşulları:</td><td id="paymentTerms"></td></tr>
+                                <tr><td>Durum:</td><td id="quotationStatus"></td></tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <h6 class="text-primary mb-3">Teklif Kalemleri</h6>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Ürün/Hizmet</th>
+                                    <th>Miktar</th>
+                                    <th>Birim</th>
+                                    <th>Birim Fiyat</th>
+                                    <th>Toplam</th>
+                                </tr>
+                            </thead>
+                            <tbody id="quotationItems">
+                                <!-- Items will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4" id="quotationNotes">
+                        <h6 class="text-primary mb-3">Notlar</h6>
+                        <div class="bg-dark p-3 rounded" id="notesContent">
+                            <!-- Notes will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <div id="quotationActions">
+                        <!-- Action buttons will be loaded based on status -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compare Quotations Modal -->
+    <div class="modal fade" id="compareQuotationsModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-balance-scale me-2"></i>Teklif Karşılaştırma
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Talep Seçin</label>
+                            <select class="form-select" id="compareRequestSelect">
+                                <option value="">Talep seçin...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <button class="btn btn-primary" onclick="loadQuotationsForComparison()">
+                                <i class="fas fa-search me-2"></i>Teklifleri Getir
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="comparisonContainer">
+                        <!-- Comparison content will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-success" id="selectWinnerBtn" style="display: none;" onclick="selectWinner()">
+                        <i class="fas fa-trophy me-2"></i>Kazanan Belirle
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        let quotationsTable;
+        let currentFilter = 'all';
+        let selectedWinner = null;
+
+        $(document).ready(function() {
+            checkAuth();
+            initDataTable();
+            loadQuotations();
+            loadStats();
+            setupEventHandlers();
+            loadRequestsForComparison();
+        });
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('tedarik_user') || '{}');
+            if (!user.token || user.role !== 'admin') {
+                window.location.href = '/login';
+                return;
+            }
+        }
+
+        function initDataTable() {
+            quotationsTable = $('#quotationsTable').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/tr.json'
+                },
+                pageLength: 25,
+                order: [[3, 'desc']], // Sort by quotation date
+                columnDefs: [
+                    { targets: [7], orderable: false }
+                ],
+                dom: '<"row"<"col-sm-6"l><"col-sm-6"f>>rtip'
+            });
+        }
+
+        function loadStats() {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+            
+            fetch('/api/admin/quotation-stats', {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('totalQuotations').textContent = data.stats.total || 0;
+                    document.getElementById('pendingQuotations').textContent = data.stats.pending || 0;
+                    document.getElementById('acceptedQuotations').textContent = data.stats.accepted || 0;
+                    document.getElementById('totalValue').textContent = `₺${formatNumber(data.stats.totalValue || 0)}`;
+                }
+            })
+            .catch(error => {
+                console.error('Stats yükleme hatası:', error);
+            });
+        }
+
+        function loadQuotations() {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+            
+            document.getElementById('loadingSpinner').style.display = 'block';
+            
+            const url = currentFilter === 'all' ? 
+                '/api/admin/quotations' : 
+                `/api/admin/quotations?status=${currentFilter}`;
+            
+            fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                
+                if (data.success) {
+                    quotationsTable.clear();
+                    
+                    data.quotations.forEach(quotation => {
+                        const statusBadge = getStatusBadge(quotation.status);
+                        const quotationDate = new Date(quotation.created_at).toLocaleDateString('tr-TR');
+                        const validUntil = new Date(quotation.valid_until).toLocaleDateString('tr-TR');
+                        const isExpired = new Date(quotation.valid_until) < new Date();
+                        
+                        quotationsTable.row.add([
+                            quotation.id,
+                            `<strong>${quotation.request_title}</strong><br><small class="text-muted">#${quotation.request_id}</small>`,
+                            `<strong>${quotation.supplier_name}</strong><br><small class="text-muted">${quotation.supplier_email}</small>`,
+                            quotationDate,
+                            `${validUntil}${isExpired ? '<br><small class="text-danger">Süresi Dolmuş</small>' : ''}`,
+                            `<strong class="text-success">₺${formatNumber(quotation.total_amount)}</strong>`,
+                            statusBadge,
+                            `<div class="btn-group btn-group-sm">
+                                <button class="btn btn-info btn-sm" onclick="viewQuotation(${quotation.id})" title="Görüntüle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                ${quotation.status === 'pending' ? `
+                                    <button class="btn btn-success btn-sm" onclick="approveQuotation(${quotation.id})" title="Onayla">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="rejectQuotation(${quotation.id})" title="Reddet">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                ` : ''}
+                                <button class="btn btn-primary btn-sm" onclick="openCompareModal(${quotation.request_id})" title="Karşılaştır">
+                                    <i class="fas fa-balance-scale"></i>
+                                </button>
+                            </div>`
+                        ]);
+                    });
+                    
+                    quotationsTable.draw();
+                    document.getElementById('quotationsTable').style.display = 'table';
+                } else {
+                    Swal.fire('Hata!', data.message || 'Teklifler yüklenemedi', 'error');
+                }
+            })
+            .catch(error => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                console.error('Teklif yükleme hatası:', error);
+                Swal.fire('Hata!', 'Teklifler yüklenirken bir hata oluştu', 'error');
+            });
+        }
+
+        function getStatusBadge(status) {
+            const statusMap = {
+                'pending': '<span class="badge bg-warning">Bekliyor</span>',
+                'under_review': '<span class="badge bg-primary">İncelemede</span>',
+                'accepted': '<span class="badge bg-success">Kabul Edildi</span>',
+                'rejected': '<span class="badge bg-danger">Reddedildi</span>',
+                'expired': '<span class="badge bg-secondary">Süresi Doldu</span>'
+            };
+            return statusMap[status] || '<span class="badge bg-secondary">Bilinmiyor</span>';
+        }
+
+        function formatNumber(number) {
+            return new Intl.NumberFormat('tr-TR').format(number);
+        }
+
+        function setupEventHandlers() {
+            // Filter tabs
+            document.querySelectorAll('.filter-tabs .nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    document.querySelectorAll('.filter-tabs .nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    currentFilter = this.getAttribute('data-filter');
+                    loadQuotations();
+                });
+            });
+        }
+
+        function viewQuotation(quotationId) {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+
+            fetch(`/api/admin/quotations/${quotationId}`, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const quotation = data.quotation;
+                    
+                    // Fill modal with quotation data
+                    document.getElementById('quotationId').textContent = quotation.id;
+                    document.getElementById('quotationSupplier').textContent = quotation.supplier_name;
+                    document.getElementById('quotationRequest').textContent = quotation.request_title;
+                    document.getElementById('quotationDate').textContent = new Date(quotation.created_at).toLocaleDateString('tr-TR');
+                    document.getElementById('quotationValidity').textContent = new Date(quotation.valid_until).toLocaleDateString('tr-TR');
+                    document.getElementById('deliveryTime').textContent = quotation.delivery_time || '-';
+                    document.getElementById('subtotal').textContent = `₺${formatNumber(quotation.subtotal)}`;
+                    document.getElementById('taxAmount').textContent = `₺${formatNumber(quotation.tax_amount)}`;
+                    document.getElementById('discount').textContent = quotation.discount_amount ? `₺${formatNumber(quotation.discount_amount)}` : '-';
+                    document.getElementById('totalAmount').textContent = `₺${formatNumber(quotation.total_amount)}`;
+                    document.getElementById('paymentTerms').textContent = quotation.payment_terms || '-';
+                    document.getElementById('quotationStatus').innerHTML = getStatusBadge(quotation.status);
+
+                    // Load quotation items
+                    const itemsContainer = document.getElementById('quotationItems');
+                    if (quotation.items && quotation.items.length > 0) {
+                        itemsContainer.innerHTML = quotation.items.map(item => `
+                            <tr>
+                                <td>${item.item_name}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.unit || '-'}</td>
+                                <td>₺${formatNumber(item.unit_price)}</td>
+                                <td>₺${formatNumber(item.total_price)}</td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        itemsContainer.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Kalem bilgisi bulunamadı</td></tr>';
+                    }
+
+                    // Load notes
+                    document.getElementById('notesContent').textContent = quotation.notes || 'Not bulunmamaktadır.';
+
+                    // Load action buttons based on status
+                    const actionsContainer = document.getElementById('quotationActions');
+                    if (quotation.status === 'pending') {
+                        actionsContainer.innerHTML = `
+                            <button type="button" class="btn btn-success" onclick="approveQuotation(${quotation.id})">
+                                <i class="fas fa-check me-2"></i>Onayla
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="rejectQuotation(${quotation.id})">
+                                <i class="fas fa-times me-2"></i>Reddet
+                            </button>
+                        `;
+                    } else {
+                        actionsContainer.innerHTML = '';
+                    }
+
+                    new bootstrap.Modal(document.getElementById('viewQuotationModal')).show();
+                } else {
+                    Swal.fire('Hata!', data.message || 'Teklif bilgileri yüklenemedi', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Teklif detay yükleme hatası:', error);
+                Swal.fire('Hata!', 'Teklif bilgileri yüklenirken bir hata oluştu', 'error');
+            });
+        }
+
+        function approveQuotation(quotationId) {
+            Swal.fire({
+                title: 'Teklifi Onayla',
+                text: 'Bu teklifi onaylamak istediğinizden emin misiniz?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Onayla',
+                cancelButtonText: 'İptal',
+                confirmButtonColor: '#10b981'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    updateQuotationStatus(quotationId, 'accepted', 'Teklif başarıyla onaylandı');
+                }
+            });
+        }
+
+        function rejectQuotation(quotationId) {
+            Swal.fire({
+                title: 'Teklifi Reddet',
+                text: 'Bu teklifi reddetmek istediğinizden emin misiniz?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Reddet',
+                cancelButtonText: 'İptal',
+                confirmButtonColor: '#ef4444'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    updateQuotationStatus(quotationId, 'rejected', 'Teklif reddedildi');
+                }
+            });
+        }
+
+        function updateQuotationStatus(quotationId, status, successMessage) {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+
+            fetch(`/api/admin/quotations/${quotationId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Başarılı!', successMessage, 'success');
+                    loadQuotations();
+                    loadStats();
+                    
+                    // Close modals if open
+                    const modals = ['viewQuotationModal'];
+                    modals.forEach(modalId => {
+                        const modalElement = document.getElementById(modalId);
+                        const modal = bootstrap.Modal.getInstance(modalElement);
+                        if (modal) modal.hide();
+                    });
+                } else {
+                    Swal.fire('Hata!', data.message || 'İşlem gerçekleştirilemedi', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Durum güncelleme hatası:', error);
+                Swal.fire('Hata!', 'Durum güncellenirken bir hata oluştu', 'error');
+            });
+        }
+
+        function loadRequestsForComparison() {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+
+            fetch('/api/admin/requests?status=published', {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const select = document.getElementById('compareRequestSelect');
+                    select.innerHTML = '<option value="">Talep seçin...</option>';
+                    
+                    data.requests.forEach(request => {
+                        select.innerHTML += `<option value="${request.id}">${request.title}</option>`;
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Request yükleme hatası:', error);
+            });
+        }
+
+        function openCompareModal(requestId) {
+            document.getElementById('compareRequestSelect').value = requestId;
+            new bootstrap.Modal(document.getElementById('compareQuotationsModal')).show();
+            loadQuotationsForComparison();
+        }
+
+        function loadQuotationsForComparison() {
+            const requestId = document.getElementById('compareRequestSelect').value;
+            if (!requestId) {
+                Swal.fire('Uyarı!', 'Lütfen bir talep seçin', 'warning');
+                return;
+            }
+
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+
+            fetch(`/api/admin/requests/${requestId}/quotations`, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayQuotationsComparison(data.quotations);
+                } else {
+                    document.getElementById('comparisonContainer').innerHTML = '<p class="text-center text-muted">Bu talep için teklif bulunamadı.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Karşılaştırma yükleme hatası:', error);
+                document.getElementById('comparisonContainer').innerHTML = '<p class="text-center text-danger">Teklifler yüklenirken hata oluştu</p>';
+            });
+        }
+
+        function displayQuotationsComparison(quotations) {
+            if (!quotations || quotations.length === 0) {
+                document.getElementById('comparisonContainer').innerHTML = '<p class="text-center text-muted">Bu talep için teklif bulunamadı.</p>';
+                return;
+            }
+
+            // Sort by total amount
+            quotations.sort((a, b) => a.total_amount - b.total_amount);
+
+            const container = document.getElementById('comparisonContainer');
+            container.innerHTML = quotations.map((quotation, index) => `
+                <div class="comparison-card ${quotation.status === 'accepted' ? 'winner' : ''}" data-quotation-id="${quotation.id}">
+                    <div class="comparison-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">${quotation.supplier_name}</h6>
+                            <small class="text-muted">${quotation.supplier_email}</small>
+                        </div>
+                        <div class="text-end">
+                            ${quotation.status === 'accepted' ? '<span class="badge bg-success"><i class="fas fa-trophy me-1"></i>Kazanan</span>' : ''}
+                            ${index === 0 && quotation.status !== 'accepted' ? '<span class="badge bg-primary">En Düşük Fiyat</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="comparison-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-dark table-sm">
+                                    <tr><td>Toplam Fiyat:</td><td class="price-highlight">₺${formatNumber(quotation.total_amount)}</td></tr>
+                                    <tr><td>Teslimat Süresi:</td><td>${quotation.delivery_time || '-'}</td></tr>
+                                    <tr><td>Geçerlilik:</td><td>${new Date(quotation.valid_until).toLocaleDateString('tr-TR')}</td></tr>
+                                    <tr><td>Ödeme Koşulları:</td><td>${quotation.payment_terms || '-'}</td></tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-dark table-sm">
+                                    <tr><td>Ara Toplam:</td><td>₺${formatNumber(quotation.subtotal)}</td></tr>
+                                    <tr><td>KDV:</td><td>₺${formatNumber(quotation.tax_amount)}</td></tr>
+                                    <tr><td>İndirim:</td><td>${quotation.discount_amount ? `₺${formatNumber(quotation.discount_amount)}` : '-'}</td></tr>
+                                    <tr><td>Durum:</td><td>${getStatusBadge(quotation.status)}</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                        ${quotation.notes ? `<div class="mt-3"><strong>Notlar:</strong><br><small class="text-muted">${quotation.notes}</small></div>` : ''}
+                        <div class="mt-3">
+                            <button class="btn btn-info btn-sm me-2" onclick="viewQuotation(${quotation.id})">
+                                <i class="fas fa-eye me-1"></i>Detayları Gör
+                            </button>
+                            ${quotation.status === 'pending' ? `
+                                <button class="btn btn-success btn-sm me-2" onclick="selectQuotationAsWinner(${quotation.id})">
+                                    <i class="fas fa-trophy me-1"></i>Kazanan Seç
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Show select winner button if there are pending quotations
+            const hasPending = quotations.some(q => q.status === 'pending');
+            document.getElementById('selectWinnerBtn').style.display = hasPending ? 'inline-block' : 'none';
+        }
+
+        function selectQuotationAsWinner(quotationId) {
+            selectedWinner = quotationId;
+            
+            // Highlight selected quotation
+            document.querySelectorAll('.comparison-card').forEach(card => {
+                card.classList.remove('winner');
+            });
+            
+            document.querySelector(`[data-quotation-id="${quotationId}"]`).classList.add('winner');
+        }
+
+        function selectWinner() {
+            if (!selectedWinner) {
+                Swal.fire('Uyarı!', 'Lütfen bir kazanan teklif seçin', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Kazanan Teklifi Belirle',
+                text: 'Seçilen teklifi kazanan olarak belirlemek istediğinizden emin misiniz?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Belirle',
+                cancelButtonText: 'İptal',
+                confirmButtonColor: '#10b981'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    updateQuotationStatus(selectedWinner, 'accepted', 'Kazanan teklif belirlendi');
+                    loadQuotationsForComparison();
+                    selectedWinner = null;
+                }
+            });
+        }
+
+        function exportQuotations(format) {
+            const user = JSON.parse(localStorage.getItem('tedarik_user'));
+            
+            const url = `/api/admin/quotations/export?format=${format}&status=${currentFilter}`;
+            
+            fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    throw new Error('Export failed');
+                }
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `teklifler_${new Date().toISOString().split('T')[0]}.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                Swal.fire('Başarılı!', 'Dosya başarıyla indirildi', 'success');
+            })
+            .catch(error => {
+                console.error('Export hatası:', error);
+                Swal.fire('Hata!', 'Dosya indirilemedi', 'error');
+            });
+        }
+
+        function logout() {
+            Swal.fire({
+                title: 'Çıkış Yap',
+                text: 'Oturumu sonlandırmak istediğinizden emin misiniz?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Çık',
+                cancelButtonText: 'İptal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('tedarik_user');
+                    window.location.href = '/login';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
