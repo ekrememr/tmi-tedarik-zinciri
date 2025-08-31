@@ -1,0 +1,2 @@
+# This file ensures the database directory is included in git
+# SQLite database file will be created here at runtime
