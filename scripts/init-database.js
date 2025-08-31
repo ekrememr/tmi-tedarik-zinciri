@@ -2,8 +2,10 @@ const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const path = require('path');
 
-// Database dosyası yolu
-const dbPath = path.join(__dirname, '../database/tedarik.db');
+// Database dosyası yolu - Production'da /tmp kullan
+const dbPath = process.env.NODE_ENV === 'production' 
+    ? '/tmp/tedarik.db' 
+    : path.join(__dirname, '../database/tedarik.db');
 
 console.log('🗄️  TEDARİK ZİNCİRİ VERİTABANI KURULUMU BAŞLIYOR...\n');
 

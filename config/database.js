@@ -4,7 +4,12 @@ const path = require('path');
 class Database {
     constructor() {
         this.db = null;
-        this.dbPath = path.join(__dirname, '../database/tedarik.db');
+        // Production'da /tmp kullan, development'da local klasör
+        if (process.env.NODE_ENV === 'production') {
+            this.dbPath = '/tmp/tedarik.db';
+        } else {
+            this.dbPath = path.join(__dirname, '../database/tedarik.db');
+        }
     }
 
     // Veritabanı bağlantısı
